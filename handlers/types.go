@@ -1,18 +1,11 @@
 package handlers
 
-type WargamingBaseResponse struct {
-	Status string                 `json:"status"`
-	Error  WargamingResponseError `json:"error"`
-	Meta   WargamingResponseMeta  `json:"meta"`
+type ResponseJSON struct {
+	Data  interface{}    `json:"data"`
+	Error *ResponseError `json:"error,omitempty"`
 }
 
-type WargamingResponseMeta struct {
-	Count int `json:"count"`
-}
-
-type WargamingResponseError struct {
-	Message string `json:"message"`
-	Field   string `json:"field"`
-	Value   string `json:"value"`
-	Code    int    `json:"code"`
+type ResponseError struct {
+	Message string `json:"message,omitempty"`
+	Context string `json:"context,omitempty"`
 }
