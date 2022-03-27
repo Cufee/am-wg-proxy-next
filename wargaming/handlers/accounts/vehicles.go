@@ -5,15 +5,16 @@ import (
 	"fmt"
 
 	"aftermath.link/repo/am-wg-proxy/wargaming/client"
-	"aftermath.link/repo/am-wg-proxy/wargaming/handlers"
+	"github.com/byvko-dev/am-types/wargaming/generic/api"
+	"github.com/byvko-dev/am-types/wargaming/v1/statistics"
 )
 
 type VehiclesResponse struct {
-	handlers.WargamingBaseResponse
-	Data map[string][]VehicleStats `json:"data"`
+	api.Response
+	Data map[string][]statistics.VehicleStatsFrame `json:"data"`
 }
 
-func GetAccountVehicles(bucket, realm string, playerId int) ([]VehicleStats, error) {
+func GetAccountVehicles(bucket, realm string, playerId int) ([]statistics.VehicleStatsFrame, error) {
 	var response VehiclesResponse
 	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("tanks/stats/?account_id=%v", playerId), "GET", nil, &response)
 	if err != nil {

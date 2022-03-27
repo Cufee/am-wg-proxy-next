@@ -6,15 +6,16 @@ import (
 
 	"aftermath.link/repo/am-wg-proxy/logs"
 	"aftermath.link/repo/am-wg-proxy/wargaming/client"
-	"aftermath.link/repo/am-wg-proxy/wargaming/handlers"
+	"github.com/byvko-dev/am-types/wargaming/generic/api"
+	"github.com/byvko-dev/am-types/wargaming/v1/accounts"
 )
 
 type SearchResponse struct {
-	handlers.WargamingBaseResponse
-	Data []BaseDetails `json:"data"`
+	api.Response
+	Data []accounts.BaseProfile `json:"data"`
 }
 
-func SearchAccounts(bucket, realm, query string) ([]BaseDetails, error) {
+func SearchAccounts(bucket, realm, query string) ([]accounts.BaseProfile, error) {
 	var response SearchResponse
 	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("account/list/?search=%v&limit=3", query), "GET", nil, &response)
 	if err != nil {

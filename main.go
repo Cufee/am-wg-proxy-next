@@ -3,7 +3,8 @@ package main
 import (
 	"os"
 
-	"aftermath.link/repo/am-wg-proxy/handlers"
+	"aftermath.link/repo/am-wg-proxy/handlers/fast"
+	"aftermath.link/repo/am-wg-proxy/handlers/query"
 	"aftermath.link/repo/am-wg-proxy/logs"
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
@@ -20,28 +21,35 @@ func main() {
 	}))
 	app.Use(logger.New())
 
-	prometheus := fiberprometheus.New("my-service-name")
+	prometheus := fiberprometheus.New("am-wg-proxy")
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
 
+	v1 := app.Group("/v1")
+
+	// Quick checks
+	fastPath := v1.Group("/fast")
+	fastPath.Get("/account/id/:id/realm", fast.AccountRealmByIDHandler)
+	fastPath.Get("/account/name/:name/id", fast.AccountIDByNameHandler)
+
 	// Selecting a realm
-	query := app.Group("/query/:realm")
+	queryPath := v1.Group("/query/:realm")
 
 	// Accounts
-	accounts := query.Group("/accounts")
-	accounts.Get("/search", handlers.SearchAccountsHandler)
-	accounts.Get("/:pid/achievements", handlers.AccountAchievementsHandler)
-	accounts.Get("/:pid/vehicles", handlers.AccountVehiclesHandler)
-	accounts.Get("/:pid/clan", handlers.AccountClanInfoHandler)
-	accounts.Get("/:pid", handlers.AccountInfoHandler)
+	accounts := queryPath.Group("/accounts")
+	accounts.Get("/search", query.SearchAccountsHandler)
+	accounts.Get("/:pid/achievements", query.AccountAchievementsHandler)
+	accounts.Get("/:pid/vehicles", query.AccountVehiclesHandler)
+	accounts.Get("/:pid/clan", query.AccountClanInfoHandler)
+	accounts.Get("/:pid", query.AccountInfoHandler)
 
 	// Clans
-	clans := query.Group("/clans")
-	clans.Get("/search", handlers.SearchClansHandler)
-	clans.Get("/:cid", handlers.ClanInfoHandler)
+	clans := queryPath.Group("/clans")
+	clans.Get("/search", query.SearchClansHandler)
+	clans.Get("/:cid", query.ClanInfoHandler)
 
 	// Glossary
-	glossary := query.Group("/glossary")
+	glossary := queryPath.Group("/glossary")
 	glossary.Get("/info", dummyHandlerfunc)
 	glossary.Get("/achievements/:aid", dummyHandlerfunc)
 	glossary.Get("/achievements", dummyHandlerfunc)

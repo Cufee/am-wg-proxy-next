@@ -5,23 +5,16 @@ import (
 	"fmt"
 
 	"aftermath.link/repo/am-wg-proxy/wargaming/client"
-	"aftermath.link/repo/am-wg-proxy/wargaming/handlers"
+	"github.com/byvko-dev/am-types/wargaming/generic/api"
+	"github.com/byvko-dev/am-types/wargaming/v1/clans"
 )
 
 type ClanSearchResponse struct {
-	handlers.WargamingBaseResponse
-	Data []BasicClanDetails `json:"data"`
+	api.Response
+	Data []clans.BasicProfile `json:"data"`
 }
 
-type BasicClanDetails struct {
-	MembersCount int64  `json:"members_count"`
-	Name         string `json:"name"`
-	CreatedAt    int64  `json:"created_at"`
-	Tag          string `json:"tag"`
-	ClanID       int64  `json:"clan_id"`
-}
-
-func SearchClans(bucket, realm, search string) ([]BasicClanDetails, error) {
+func SearchClans(bucket, realm, search string) ([]clans.BasicProfile, error) {
 	var response ClanSearchResponse
 	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("clans/list/?search=%v&limit=3", search), "GET", nil, &response)
 	if err != nil {

@@ -5,22 +5,23 @@ import (
 	"fmt"
 
 	"aftermath.link/repo/am-wg-proxy/wargaming/client"
-	"aftermath.link/repo/am-wg-proxy/wargaming/handlers"
+	"github.com/byvko-dev/am-types/wargaming/generic/api"
+	"github.com/byvko-dev/am-types/wargaming/v1/statistics"
 )
 
 type AchievementsResponse struct {
-	handlers.WargamingBaseResponse
-	Data map[string]AchievementsFrame `json:"data"`
+	api.Response
+	Data map[string]statistics.AchievementsFrame `json:"data"`
 }
 
-func GetAccountAchievements(bucket, realm string, playerId int) (AchievementsFrame, error) {
+func GetAccountAchievements(bucket, realm string, playerId int) (statistics.AchievementsFrame, error) {
 	var response AchievementsResponse
 	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("account/achievements/?account_id=%v&fields=achievements", playerId), "GET", nil, &response)
 	if err != nil {
-		return AchievementsFrame{}, err
+		return statistics.AchievementsFrame{}, err
 	}
 	if response.Error.Code != 0 {
-		return AchievementsFrame{}, errors.New(response.Error.Message)
+		return statistics.AchievementsFrame{}, errors.New(response.Error.Message)
 	}
 
 	info, ok := response.Data[fmt.Sprint(playerId)]
