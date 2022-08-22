@@ -11,7 +11,7 @@ import (
 
 func SearchAccountsHandler(c *fiber.Ctx) error {
 	var response api.ResponseWithError
-	query := c.Query("query")
+	query := c.Query("query", c.Query("q", ""))
 	realm := c.Params("realm")
 	if query == "" || realm == "" {
 		response.Error.Message = "Query and realm are required"

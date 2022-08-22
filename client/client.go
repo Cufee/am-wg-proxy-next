@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"aftermath.link/repo/am-wg-proxy/logs"
 	_ "github.com/joho/godotenv/autoload"
@@ -52,7 +51,7 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	}
 
 	client := &http.Client{
-		Timeout:   5 * time.Second,
+		// Timeout:   5 * time.Second,
 		Transport: transport,
 	}
 	resp, err = client.Do(req)

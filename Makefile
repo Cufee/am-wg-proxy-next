@@ -1,6 +1,6 @@
-SERVICE := am-wg-proxy
-NAMESPACE := aftermath-wg-proxy
-REGISTRY := docker.io/vkouzin
+SERVICE := am-wg-api
+NAMESPACE := aftermath-wargaming
+REGISTRY := ghcr.io/byvko-dev
 # 
 VERSION = $(shell git rev-parse --short HEAD)
 TAG := ${REGISTRY}/${SERVICE}
@@ -12,18 +12,13 @@ pull:
 	git pull
 
 build:
-	docker build -t ${TAG}:${VERSION} .
-	docker tag ${TAG}:${VERSION} ${TAG}:latest
+	go mod tidy
+	go mod vendor
+	docker build -t ${TAG}:${VERSION} -t ${TAG}:latest .
 	docker image prune -f
 
 push:
 	docker push ${TAG}:latest
 
-apply:
-	kubectl apply -f .kube/
-
 restart:
 	kubectl rollout restart deployment/${SERVICE} -n ${NAMESPACE}
-
-ctx:
-	kubectl config set-context --current --namespace=${NAMESPACE}

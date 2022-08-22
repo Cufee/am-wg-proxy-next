@@ -13,7 +13,7 @@ import (
 
 // Application ID will be added to query string here
 func WargamingRequest(bucketName, realm, path, method string, payload []byte, target interface{}) (int, error) {
-	bucket, proxyUrl, err := getProxyBucketAndUrl(realm, bucketName)
+	bucket, _, err := getProxyBucketAndUrl(realm, bucketName)
 	if err != nil {
 		return 0, err
 	}
@@ -45,7 +45,7 @@ func WargamingRequest(bucketName, realm, path, method string, payload []byte, ta
 
 	logs.Debug("WargamingRequest: %v %v", method, endpoint.String())
 
-	return client.HttpRequest(endpoint.String(), method, proxyUrl, nil, payload, target)
+	return client.HttpRequest(endpoint.String(), method, nil, nil, payload, target)
 }
 
 func baseUriFromRealm(realm string) (string, error) {

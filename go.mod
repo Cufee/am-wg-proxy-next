@@ -8,7 +8,10 @@ require (
 	github.com/joho/godotenv v1.4.0
 )
 
-require github.com/byvko-dev/am-types v1.1.7
+require (
+	github.com/byvko-dev/am-core v1.2.7
+	github.com/byvko-dev/am-types v1.1.13
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.2 // indirect
@@ -16,9 +19,8 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/gofiber/adaptor/v2 v2.1.1 // indirect
 	github.com/gofiber/utils v0.1.2 // indirect
-	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/google/go-cmp v0.5.2 // indirect
-	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/prometheus/client_golang v1.9.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
@@ -27,6 +29,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.31.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/sys v0.0.0-20210514084401-e8d321eab015 // indirect
-	google.golang.org/protobuf v1.25.0 // indirect
+	golang.org/x/sys v0.0.0-20220327210214-530d0810a4d0 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 )

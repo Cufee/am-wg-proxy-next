@@ -21,7 +21,7 @@ func main() {
 	}))
 	app.Use(logger.New())
 
-	prometheus := fiberprometheus.New("am-wg-proxy")
+	prometheus := fiberprometheus.New("am-wg-api")
 	prometheus.RegisterAt(app, "/metrics")
 	app.Use(prometheus.Middleware)
 
@@ -30,7 +30,6 @@ func main() {
 	// Quick checks
 	fastPath := v1.Group("/fast")
 	fastPath.Get("/account/id/:id/realm", fast.AccountRealmByIDHandler)
-	fastPath.Get("/account/name/:name/id", fast.AccountIDByNameHandler)
 
 	// Selecting a realm
 	queryPath := v1.Group("/query/:realm")
@@ -50,15 +49,15 @@ func main() {
 
 	// Glossary
 	glossary := queryPath.Group("/glossary")
-	glossary.Get("/info", dummyHandlerfunc)
-	glossary.Get("/achievements/:aid", dummyHandlerfunc)
-	glossary.Get("/achievements", dummyHandlerfunc)
-	glossary.Get("/vehicles/:vid", dummyHandlerfunc)
-	glossary.Get("/vehicles", dummyHandlerfunc)
+	glossary.Get("/info", dummyHandlerFunc)
+	glossary.Get("/achievements/:aid", dummyHandlerFunc)
+	glossary.Get("/achievements", dummyHandlerFunc)
+	glossary.Get("/vehicles/:vid", dummyHandlerFunc)
+	glossary.Get("/vehicles", dummyHandlerFunc)
 
 	logs.Fatal("Failed to start a server: %v", app.Listen(":"+os.Getenv("PORT")))
 }
 
-func dummyHandlerfunc(c *fiber.Ctx) error {
+func dummyHandlerFunc(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNotImplemented)
 }
