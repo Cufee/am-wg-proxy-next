@@ -8,10 +8,10 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func getProxyBucketAndUrl(realm, bucketName string) (*bucket, *url.URL, error) {
+func getProxyBucketAndUrl(realm, bucketName string) (*bucket, *url.URL, string, error) {
 	bkt, err := getRpsBucket(bucketName)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, "", err
 	}
 
 	username := bkt.username
@@ -19,7 +19,7 @@ func getProxyBucketAndUrl(realm, bucketName string) (*bucket, *url.URL, error) {
 		username += proxyCountryFromRealm(realm)
 	}
 
-	return bkt, buildProxyURL(bkt.host, bkt.port, username, bkt.password), nil
+	return bkt, buildProxyURL(bkt.host, bkt.port, username, bkt.password), fmt.Sprintf("%s:%s", username, bkt.password), nil
 }
 
 func buildProxyURL(host, port, username, password string) *url.URL {
