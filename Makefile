@@ -2,19 +2,18 @@ SERVICE := am-wg-api
 NAMESPACE := aftermath-wargaming
 REGISTRY := ghcr.io/byvko-dev
 # 
-VERSION = $(shell git rev-parse --short HEAD)
+VERSION = "$(shell git rev-parse --short HEAD)"
 TAG := ${REGISTRY}/${SERVICE}
 
 echo:
-	@echo "Tag:" ${TAG}
+	@echo "Tag:" ${TAG}:${VERSION}
 
 pull:
 	git pull
 
 build:
-	go mod tidy
-	go mod vendor
-	docker build -t ${TAG}:${VERSION} -t ${TAG}:latest .
+	export DOCKER_BUILDKIT=1
+	docker build -t ${TAG}:${VERSION} -t ${TAG}:latest --secret id=ssh_priv,src=$(HOME)/.ssh/id_rsa --secret id=ssh_pub,src=$(HOME)/.ssh/id_rsa.pub .
 	docker image prune -f
 
 push:

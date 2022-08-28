@@ -10,7 +10,7 @@ require (
 
 require (
 	github.com/byvko-dev/am-core v1.2.9
-	github.com/byvko-dev/am-types v1.4.3
+	github.com/byvko-dev/am-types v1.5.1
 	github.com/pkg/errors v0.9.1
 )
 
