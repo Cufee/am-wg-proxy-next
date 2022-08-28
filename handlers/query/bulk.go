@@ -2,7 +2,7 @@ package query
 
 import (
 	"aftermath.link/repo/am-wg-proxy/wargaming/handlers/accounts"
-	"github.com/byvko-dev/am-types/api/v1"
+	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/gofiber/fiber/v2"
 )
 

@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"aftermath.link/repo/am-wg-proxy/wargaming/handlers/clans"
-	"github.com/byvko-dev/am-types/api/v1"
+	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/gofiber/fiber/v2"
 )
 
