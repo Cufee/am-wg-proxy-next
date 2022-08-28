@@ -14,9 +14,9 @@ type AccountClanInfoResponse struct {
 	Data map[string]clans.MemberProfile `json:"data"`
 }
 
-func GetAccountClanInfo(bucket, realm string, playerId int) (clans.MemberProfile, error) {
+func GetAccountClanInfo(realm string, playerId int) (clans.MemberProfile, error) {
 	var response AccountClanInfoResponse
-	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("clans/accountinfo/?account_id=%v&extra=clan", playerId), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/accountinfo/?account_id=%v&extra=clan", playerId), "GET", nil, &response)
 	if err != nil {
 		return clans.MemberProfile{}, err
 	}

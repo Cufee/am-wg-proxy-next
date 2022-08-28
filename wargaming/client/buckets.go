@@ -1,7 +1,6 @@
 package client
 
 import (
-	"errors"
 	"os"
 	"strconv"
 	"strings"
@@ -18,115 +17,61 @@ type bucket struct {
 	wgAppId  string
 }
 
-const (
-	BucketGlobal             = "global"
-	BucketCacheUpdate        = "cacheUpdate"
-	BucketAchievementsUpdate = "achievementsUpdate"
-)
-
-var slowRpsBucket bucket
-var fastRpsBuckets = make(map[string]bucket)
+var rpsBuckets = make(map[string]bucket)
 
 func init() {
 	// Setup fast buckets
-	fastProxyHostList := strings.Split(os.Getenv("FAST_PROXY_HOST_LIST"), ",")
-	if len(fastProxyHostList) == 0 {
-		panic("FAST_PROXY_HOST_LIST not set")
+	proxyHostList := strings.Split(os.Getenv("PROXY_HOST_LIST"), ",")
+	if len(proxyHostList) == 0 {
+		panic("PROXY_HOST_LIST not set")
 	}
-	fastRps := os.Getenv("FAST_PROXY_HOST_MAX_RPS")
-	if fastRps == "" {
-		panic("FAST_PROXY_HOST_MAX_RPS not set")
+	if !strings.Contains(os.Getenv("PROXY_HOST_LIST"), ":") {
+		panic("PROXY_PORT not set and FAST_PROXY_HOST_LIST does not contain a port")
 	}
-	maxFastRps, err := strconv.Atoi(fastRps)
+
+	maxRps := os.Getenv("PROXY_HOST_MAX_RPS")
+	if maxRps == "" {
+		panic("PROXY_HOST_MAX_RPS not set")
+	}
+	rpsPerHost, err := strconv.Atoi(maxRps)
 	if err != nil {
-		panic("FAST_PROXY_HOST_MAX_RPS is not a number")
+		panic("PROXY_HOST_MAX_RPS is not a number")
 	}
-	fastPass := os.Getenv("FAST_PROXY_PASSWORD")
-	if fastPass == "" {
-		panic("FAST_PROXY_PASSWORD not set")
+
+	pass := os.Getenv("PROXY_PASSWORD")
+	if pass == "" {
+		panic("PROXY_PASSWORD not set")
 	}
-	fastUser := os.Getenv("FAST_PROXY_USERNAME")
-	if fastUser == "" {
-		panic("FAST_PROXY_USERNAME not set")
+	user := os.Getenv("PROXY_USERNAME")
+	if user == "" {
+		panic("PROXY_USERNAME not set")
 	}
-	fastPort := os.Getenv("FAST_PROXY_PORT")
-	if fastPort == "" {
-		panic("FAST_PROXY_PORT not set")
+
+	wgAppID := os.Getenv("PROXY_WG_APP_ID")
+	if wgAppID == "" {
+		panic("PROXY_WG_APP_ID not set")
 	}
-	fastWgAppId := os.Getenv("FAST_PROXY_WG_APP_ID")
-	if fastWgAppId == "" {
-		panic("FAST_PROXY_WG_APP_ID not set")
-	}
-	for _, host := range fastProxyHostList {
-		fastRpsBuckets[host] = bucket{
-			channel:  make(chan int, maxFastRps),
+	for _, host := range proxyHostList {
+		port := strings.Split(host, ":")[1]
+		host = strings.Split(host, ":")[0]
+
+		rpsBuckets[host] = bucket{
+			channel:  make(chan int, rpsPerHost),
 			host:     host,
-			port:     fastPort,
-			username: fastUser,
-			password: fastPass,
-			wgAppId:  fastWgAppId,
+			port:     port,
+			username: user,
+			password: pass,
+			wgAppId:  wgAppID,
 		}
 	}
-
-	// Setup slow bucket
-	var slawBucketHost = os.Getenv("SLOW_PROXY_HOST")
-	if slawBucketHost == "" {
-		panic("SLOW_PROXY_HOST not set")
-	}
-	slowRps := os.Getenv("SLOW_PROXY_MAX_RPS")
-	if slowRps == "" {
-		panic("SLOW_PROXY_MAX_RPS not set")
-	}
-	maxSlowRps, err := strconv.Atoi(slowRps)
-	if err != nil {
-		panic("SLOW_PROXY_MAX_RPS is not a number")
-	}
-	slowPass := os.Getenv("SLOW_PROXY_PASSWORD")
-	if slowPass == "" {
-		panic("SLOW_PROXY_PASSWORD not set")
-	}
-	slowUser := os.Getenv("SLOW_PROXY_USERNAME")
-	if slowUser == "" {
-		panic("SLOW_PROXY_USERNAME not set")
-	}
-	slowPort := os.Getenv("SLOW_PROXY_PORT")
-	if slowPort == "" {
-		panic("SLOW_PROXY_PORT not set")
-	}
-	slowWgAppId := os.Getenv("SLOW_PROXY_WG_APP_ID")
-	if slowWgAppId == "" {
-		panic("SLOW_PROXY_WG_APP_ID not set")
-	}
-	slowRpsBucket = bucket{
-		channel:  make(chan int, maxSlowRps),
-		host:     slawBucketHost,
-		port:     slowPort,
-		username: slowUser,
-		password: slowPass,
-		wgAppId:  slowWgAppId,
-	}
 }
 
-func getRpsBucket(name string) (*bucket, error) {
-	switch name {
-	case BucketGlobal:
-		b := pickFastBucket()
-		return &b, nil
-	case BucketCacheUpdate:
-		return &slowRpsBucket, nil
-	case BucketAchievementsUpdate:
-		return &slowRpsBucket, nil
-	default:
-		return nil, errors.New("unknown bucket")
-	}
-}
-
-func pickFastBucket() bucket {
+func pickBucket() *bucket {
 	var bkt bucket
-	for _, c := range fastRpsBuckets {
+	for _, c := range rpsBuckets {
 		if len(c.channel) <= len(bkt.channel) {
 			bkt = c
 		}
 	}
-	return bkt
+	return &bkt
 }

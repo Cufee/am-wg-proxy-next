@@ -15,9 +15,9 @@ type SearchResponse struct {
 	Data []accounts.BaseProfile `json:"data"`
 }
 
-func SearchAccounts(bucket, realm, query string) ([]accounts.BaseProfile, error) {
+func SearchAccounts(realm, query string) ([]accounts.BaseProfile, error) {
 	var response SearchResponse
-	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("account/list/?search=%v&limit=3", query), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/list/?search=%v&limit=3", query), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

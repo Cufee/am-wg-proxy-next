@@ -3,12 +3,13 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"aftermath.link/repo/am-wg-proxy/logs"
 	_ "github.com/joho/godotenv/autoload"
@@ -32,7 +33,7 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	// Prep request
 	req, err := http.NewRequest(strings.ToUpper(method), url, bytes.NewBuffer(payload))
 	if err != nil {
-		return 0, logs.Wrap(err, "http.NewRequest failed")
+		return 0, errors.Wrap(err, "http.NewRequest")
 	}
 
 	// Set headers
@@ -52,7 +53,7 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	}
 
 	client := &http.Client{
-		Timeout:   5 * time.Second,
+		Timeout:   30 * time.Second,
 		Transport: transport,
 	}
 	resp, err = client.Do(req)
@@ -66,14 +67,14 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	// Read body
 	bodyBytes, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return resp.StatusCode, logs.Wrap(err, "ioutil.ReadAll failed")
+		return resp.StatusCode, errors.Wrap(err, "ioutil.ReadAll failed")
 	}
 
 	// Decode
 	if target != nil {
 		err = json.Unmarshal(bodyBytes, target)
 		if err != nil {
-			return resp.StatusCode, logs.Wrap(err, "json.Unmarshal failed")
+			return resp.StatusCode, errors.Wrap(err, "json.Unmarshal failed")
 		}
 	}
 	return resp.StatusCode, nil

@@ -1,30 +1,22 @@
 package query
 
 import (
-	"strconv"
-
-	"aftermath.link/repo/am-wg-proxy/wargaming/handlers/clans"
+	"aftermath.link/repo/am-wg-proxy/wargaming/handlers/accounts"
 	"github.com/byvko-dev/am-types/api/v1"
 	"github.com/gofiber/fiber/v2"
 )
 
-func AccountClanInfoHandler(c *fiber.Ctx) error {
+func BulkAccountsInfoHandler(c *fiber.Ctx) error {
 	var response api.ResponseWithError
 
-	pid := c.Params("pid")
+	pids := c.Query("ids")
 	realm := c.Params("realm")
-	if pid == "" || realm == "" {
+	if pids == "" || realm == "" {
 		response.Error.Message = "Player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-	playerId, err := strconv.Atoi(pid)
-	if err != nil {
-		response.Error.Message = "Invalid player id"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
 
-	result, err := clans.GetAccountClanInfo(realm, playerId)
+	result, err := accounts.GetBulkAccountsInfo(realm, pids)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -35,17 +27,17 @@ func AccountClanInfoHandler(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func SearchClansHandler(c *fiber.Ctx) error {
+func BulkAccountsVehiclesHandler(c *fiber.Ctx) error {
 	var response api.ResponseWithError
 
-	query := c.Query("query")
+	pids := c.Query("ids")
 	realm := c.Params("realm")
-	if query == "" || realm == "" {
-		response.Error.Message = "Query and realm are required"
+	if pids == "" || realm == "" {
+		response.Error.Message = "Player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := clans.SearchClans(realm, query)
+	result, err := accounts.GetBulkAccountsVehicles(realm, pids)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -56,23 +48,17 @@ func SearchClansHandler(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func ClanInfoHandler(c *fiber.Ctx) error {
+func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
 	var response api.ResponseWithError
 
-	cid := c.Params("cid")
+	pids := c.Query("ids")
 	realm := c.Params("realm")
-	if cid == "" || realm == "" {
-		response.Error.Message = "Clan id and realm are required"
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
-	clanId, err := strconv.Atoi(cid)
-	if err != nil {
-		response.Error.Message = "Invalid clan id"
-		response.Error.Context = err.Error()
+	if pids == "" || realm == "" {
+		response.Error.Message = "Player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := clans.GetClanInfo(realm, clanId)
+	result, err := accounts.GetBulkAccountsAchievements(realm, pids)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()

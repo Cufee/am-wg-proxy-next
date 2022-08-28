@@ -14,9 +14,9 @@ type ClanSearchResponse struct {
 	Data []clans.BasicProfile `json:"data"`
 }
 
-func SearchClans(bucket, realm, search string) ([]clans.BasicProfile, error) {
+func SearchClans(realm, search string) ([]clans.BasicProfile, error) {
 	var response ClanSearchResponse
-	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("clans/list/?search=%v&limit=3", search), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/list/?search=%v&limit=3", search), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

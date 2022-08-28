@@ -11,6 +11,7 @@ require (
 require (
 	github.com/byvko-dev/am-core v1.2.7
 	github.com/byvko-dev/am-types v1.1.13
+	github.com/pkg/errors v0.9.1
 )
 
 require (

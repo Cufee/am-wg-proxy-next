@@ -55,6 +55,12 @@ func main() {
 	glossary.Get("/vehicles/:vid", dummyHandlerFunc)
 	glossary.Get("/vehicles", dummyHandlerFunc)
 
+	// Bulk queries
+	bulk := queryPath.Group("/bulk")
+	bulk.Get("/accounts/info", query.BulkAccountsInfoHandler)
+	bulk.Get("/accounts/vehicles", query.BulkAccountsVehiclesHandler)
+	bulk.Get("/accounts/achievements", query.BulkAccountsAchievementsHandler)
+
 	logs.Fatal("Failed to start a server: %v", app.Listen(":"+os.Getenv("PORT")))
 }
 

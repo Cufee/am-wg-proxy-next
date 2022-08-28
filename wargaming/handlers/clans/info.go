@@ -14,9 +14,9 @@ type ClanInfoResponse struct {
 	Data map[string]clans.CompleteProfile `json:"data"`
 }
 
-func GetClanInfo(bucket, realm string, clanId int) (clans.CompleteProfile, error) {
+func GetClanInfo(realm string, clanId int) (clans.CompleteProfile, error) {
 	var response ClanInfoResponse
-	_, err := client.WargamingRequest(bucket, realm, fmt.Sprintf("clans/info/?clan_id=%v", clanId), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/info/?clan_id=%v", clanId), "GET", nil, &response)
 	if err != nil {
 		return clans.CompleteProfile{}, err
 	}

@@ -13,8 +13,8 @@ import (
 )
 
 // Application ID will be added to query string here
-func WargamingRequest(bucketName, realm, path, method string, payload []byte, target interface{}) (int, error) {
-	bucket, proxyUrl, proxyAuth, err := getProxyBucketAndUrl(realm, bucketName)
+func WargamingRequest(realm, path, method string, payload []byte, target interface{}) (int, error) {
+	bucket, proxyUrl, proxyAuth, err := getProxyBucketAndUrl(realm)
 	if err != nil {
 		return 0, err
 	}

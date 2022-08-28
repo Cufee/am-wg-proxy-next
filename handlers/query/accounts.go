@@ -1,9 +1,6 @@
 package query
 
 import (
-	"strconv"
-
-	"aftermath.link/repo/am-wg-proxy/wargaming/client"
 	"aftermath.link/repo/am-wg-proxy/wargaming/handlers/accounts"
 	"github.com/byvko-dev/am-types/api/v1"
 	"github.com/gofiber/fiber/v2"
@@ -18,8 +15,7 @@ func SearchAccountsHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	bucket := c.Query("bucket", client.BucketGlobal)
-	result, err := accounts.SearchAccounts(bucket, realm, query)
+	result, err := accounts.SearchAccounts(realm, query)
 	if err != nil {
 		response.Error.Message = "player not found"
 		response.Error.Context = err.Error()
@@ -39,15 +35,8 @@ func AccountInfoHandler(c *fiber.Ctx) error {
 		response.Error.Message = "Player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-	playerId, err := strconv.Atoi(pid)
-	if err != nil {
-		response.Error.Message = "Invalid player id"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
 
-	bucket := c.Query("bucket", client.BucketGlobal)
-	result, err := accounts.GetAccountInfo(bucket, realm, playerId)
+	result, err := accounts.GetAccountInfo(realm, pid)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -67,15 +56,8 @@ func AccountAchievementsHandler(c *fiber.Ctx) error {
 		response.Error.Message = "Player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-	playerId, err := strconv.Atoi(pid)
-	if err != nil {
-		response.Error.Message = "Invalid player id"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
 
-	bucket := c.Query("bucket", client.BucketGlobal)
-	result, err := accounts.GetAccountAchievements(bucket, realm, playerId)
+	result, err := accounts.GetAccountAchievements(realm, pid)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -95,15 +77,8 @@ func AccountVehiclesHandler(c *fiber.Ctx) error {
 		response.Error.Message = "Player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-	playerId, err := strconv.Atoi(pid)
-	if err != nil {
-		response.Error.Message = "Invalid player id"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
 
-	bucket := c.Query("bucket", client.BucketGlobal)
-	result, err := accounts.GetAccountVehicles(bucket, realm, playerId)
+	result, err := accounts.GetAccountVehicles(realm, pid)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
