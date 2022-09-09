@@ -30,6 +30,13 @@ COPY --from=builder /app/binary .
 COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-# Run entrypoint script
+# Install Doppler CLI
+RUN wget -q -t3 'https://packages.doppler.com/public/cli/rsa.8004D9FF50437357.key' -O /etc/apk/keys/cli@doppler-8004D9FF50437357.rsa.pub && \
+  echo 'https://packages.doppler.com/public/cli/alpine/any-version/main' | tee -a /etc/apk/repositories && \
+  apk add doppler
+
+# Inject secrets
+ENTRYPOINT ["doppler", "run", "--"]
+
 COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
 CMD ./entrypoint.sh
