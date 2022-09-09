@@ -16,6 +16,9 @@ build:
 	docker build -t ${TAG}:${VERSION} -t ${TAG}:latest --secret id=ssh_priv,src=$(HOME)/.ssh/id_rsa --secret id=ssh_pub,src=$(HOME)/.ssh/id_rsa.pub .
 	docker image prune -f
 
+build-fly:
+	docker buildx build --platform linux/amd64,linux/arm64 --push -t registry.fly.io/${SERVICE}:latest --secret id=ssh_priv,src=$(HOME)/.ssh/id_rsa --secret id=ssh_pub,src=$(HOME)/.ssh/id_rsa.pub .
+
 push:
 	docker push ${TAG}:latest
 

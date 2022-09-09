@@ -27,6 +27,7 @@ COPY . ./
 ENV TSFILE=tailscale_1.30.1_amd64.tgz
 RUN wget https://pkgs.tailscale.com/stable/${TSFILE} && tar xzf ${TSFILE} --strip-components=1
 COPY . ./
+RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 
 FROM scratch
 
@@ -35,7 +36,9 @@ WORKDIR /app
 # Copy over tailscale
 COPY --from=tailscale /app/tailscaled /usr/bin/
 COPY --from=tailscale /app/tailscale /usr/bin/
-RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
+COPY --from=tailscale /var/lib/tailscale /var/lib/tailscale 
+COPY --from=tailscale /var/cache/tailscale /var/cache/tailscale
+COPY --from=tailscale /var/run/tailscale /var/run/tailscale
 
 ENV TZ=Europe/Berlin
 ENV ZONEINFO=/zoneinfo.zip
