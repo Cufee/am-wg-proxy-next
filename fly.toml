@@ -1,41 +1,16 @@
-# fly.toml file generated for am-wg-proxy on 2022-09-09T12:56:12-04:00
-
 app = "am-wg-proxy"
 kill_signal = "SIGINT"
 kill_timeout = 5
-processes = []
 
 [build]
-  image = "registry.fly.io/am-wg-api:latest"
+  image = "registry.fly.io/am-wg-proxy:latest"
 
 [env]
   PROXY_HOST_MAX_RPS="20"
   PROXY_HOST_LIST="136.0.116.10:4444,185.182.65.90:4444,136.0.116.169:4444,185.182.65.91:4444,45.39.255.177:4444"
   LEGACY_USERS_API_URL="https://api.aftermath.link/api/users/v1"
   TAILSCALE_APP_NAME="am-wg-proxy"
+  PORT="80"
 
 [experimental]
-  allowed_public_ports = []
   auto_rollback = true
-
-[[services]]
-  http_checks = []
-  internal_port = 8080
-  processes = ["app"]
-  protocol = "tcp"
-  script_checks = []
-  [services.concurrency]
-    hard_limit = 150
-    soft_limit = 100
-    type = "connections"
-
-  [[services.ports]]
-    force_https = true
-    handlers = ["http"]
-    port = 80
-
-  [[services.tcp_checks]]
-    grace_period = "1s"
-    interval = "15s"
-    restart_limit = 0
-    timeout = "2s"

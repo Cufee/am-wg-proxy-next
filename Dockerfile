@@ -20,25 +20,9 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o binary .
 
-# Tailscale
-FROM alpine:latest as tailscale
+# Runner
+FROM scratch as runner
 WORKDIR /app
-COPY . ./
-ENV TSFILE=tailscale_1.30.1_amd64.tgz
-RUN wget https://pkgs.tailscale.com/stable/${TSFILE} && tar xzf ${TSFILE} --strip-components=1
-COPY . ./
-RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
-
-FROM scratch
-
-WORKDIR /app
-
-# Copy over tailscale
-COPY --from=tailscale /app/tailscaled /usr/bin/
-COPY --from=tailscale /app/tailscale /usr/bin/
-COPY --from=tailscale /var/lib/tailscale /var/lib/tailscale 
-COPY --from=tailscale /var/cache/tailscale /var/cache/tailscale
-COPY --from=tailscale /var/run/tailscale /var/run/tailscale
 
 ENV TZ=Europe/Berlin
 ENV ZONEINFO=/zoneinfo.zip
@@ -46,6 +30,4 @@ COPY --from=builder /app/binary /usr/bin/
 COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-ENV PATH=/usr/bin
-
-CMD tailscaled --state=/var/lib/tailscale/tailscaled.state --socket=/var/run/tailscale/tailscaled.sock & tailscale up --authkey=${TAILSCALE_AUTHKEY} --advertise-tags=tag:service --hostname=${TAILSCALE_APP_NAME}; binary
+ENTRYPOINT [ "binary" ]

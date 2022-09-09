@@ -2,7 +2,7 @@ SERVICE := am-wg-api
 NAMESPACE := aftermath-wargaming
 REGISTRY := ghcr.io/byvko-dev
 # 
-VERSION = "$(shell git rev-parse --short HEAD)"
+VERSION = $(shell git rev-parse --short HEAD)
 TAG := ${REGISTRY}/${SERVICE}
 
 echo:
@@ -17,10 +17,8 @@ build:
 	docker image prune -f
 
 build-fly:
-	docker buildx build --platform linux/amd64,linux/arm64 --push -t registry.fly.io/${SERVICE}:latest --secret id=ssh_priv,src=$(HOME)/.ssh/id_rsa --secret id=ssh_pub,src=$(HOME)/.ssh/id_rsa.pub .
+	docker buildx build --platform linux/amd64 -t registry.fly.io/am-wg-proxy:${VERSION} -t registry.fly.io/am-wg-proxy:latest --push --secret id=ssh_priv,src=$(HOME)/.ssh/id_rsa --secret id=ssh_pub,src=$(HOME)/.ssh/id_rsa.pub .
 
-push:
-	docker push ${TAG}:latest
 
 restart:
 	kubectl rollout restart deployment/${SERVICE} -n ${NAMESPACE}
