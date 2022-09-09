@@ -13,7 +13,6 @@ COPY . ./
 ENV TSFILE=tailscale_1.30.1_amd64.tgz
 RUN wget https://pkgs.tailscale.com/stable/${TSFILE} && tar xzf ${TSFILE} --strip-components=1
 COPY . ./
-RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 
 # Runner
 FROM alpine:latest as runner
@@ -31,4 +30,4 @@ COPY --from=builder /app/binary .
 COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-CMD ./tailscaled & ./tailscale up --authkey=${TAILSCALE_AUTHKEY} --advertise-tags=tag:service --hostname=${TAILSCALE_APP_NAME}; ./binary && tailscale logout
+CMD ./tailscaled --tun=userspace-networking & ./tailscale up --authkey=${TAILSCALE_AUTHKEY} --advertise-tags=tag:service --hostname=${TAILSCALE_APP_NAME}; ./binary && tailscale logout
