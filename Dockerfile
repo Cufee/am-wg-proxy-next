@@ -9,9 +9,10 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o binary .
 # Tailscale
 FROM alpine:latest as tailscale
 WORKDIR /app
-
+COPY . ./
 ENV TSFILE=tailscale_1.30.1_amd64.tgz
 RUN wget https://pkgs.tailscale.com/stable/${TSFILE} && tar xzf ${TSFILE} --strip-components=1
+COPY . ./
 RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 RUN apk add ip6tables iptables
 
