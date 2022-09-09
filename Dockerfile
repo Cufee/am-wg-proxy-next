@@ -14,7 +14,15 @@ ENV TSFILE=tailscale_1.30.1_amd64.tgz
 RUN wget https://pkgs.tailscale.com/stable/${TSFILE} && tar xzf ${TSFILE} --strip-components=1
 COPY . ./
 RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
+
+# Runner
+FROM alpine:latest as runner
+
+# Tailscale
 RUN apk add ip6tables iptables
+COPY --from=tailscale /app/tailscale .
+COPY --from=tailscale /app/tailscaled .
+RUN mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale
 
 # Binary
 ENV TZ=Europe/Berlin
