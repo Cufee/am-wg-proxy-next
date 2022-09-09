@@ -31,6 +31,5 @@ COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Run entrypoint script
-COPY --from=builder /app/entrypoint.sh entrypoint.sh
-RUN chmod +x entrypoint.sh
-CMD [ "entrypoint.sh" ]
+COPY --from=builder /app/entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
