@@ -21,3 +21,4 @@ push:
 
 restart:
 	kubectl rollout restart deployment/${SERVICE} -n ${NAMESPACE}
+	kubectl rollout restart deployment/${SERVICE}-cache -n ${NAMESPACE}
