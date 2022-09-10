@@ -1,23 +1,3 @@
-# REGISTRY := registry.fly.io
-# VERSION = $(shell git rev-parse --short HEAD)
-
-# echo:
-# 	@echo "Tag:" ${REGISTRY}/${APP_NAME}:${VERSION}
-
-# build:
-# 	docker buildx build --platform linux/amd64 -t ${REGISTRY}/${APP_NAME}:${VERSION} -t ${TAG}:latest --push --secret id=ssh_priv,src=$(HOME)/.ssh/id_rsa --secret id=ssh_pub,src=$(HOME)/.ssh/id_rsa.pub .
-
-# deploy:
-# 	flyctl deploy --app ${APP_NAME} --image ${REGISTRY}/${APP_NAME}:${VERSION}
-
-# slow:
-# 	@cat slow.fly.toml > fly.toml
-# 	export APP_NAME=am-wg-proxy-slow
-
-# fast:
-# 	@cat slow.fly.toml > fly.toml
-# 	export APP_NAME=am-wg-proxy-fast
-
 version: "3"
 
 vars:
@@ -30,9 +10,21 @@ env:
 
 tasks:
   build:
-    desc: Build images for fast and slow proxy
+    desc: Build and tag images for fast and slow proxy
     cmds:
-      - docker buildx build --platform linux/amd64 -t $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}} -t $REGISTRY/$BASE_APP_NAME-slow:latest -t $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}} -t $REGISTRY/$BASE_APP_NAME-fast:latest --push --secret id=ssh_priv,src=$HOME/.ssh/id_rsa --secret id=ssh_pub,src=$HOME/.ssh/id_rsa.pub .
+      - docker buildx build --platform linux/amd64 -t $REGISTRY/$BASE_APP_NAME{{.VERSION}} --load --secret id=ssh_priv,src=$HOME/.ssh/id_rsa --secret id=ssh_pub,src=$HOME/.ssh/id_rsa.pub .
+      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}}
+      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-slow:latest
+      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}}
+      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-fast:latest
+
+  push:
+    desc: Push images for fast and slow proxy
+    cmds:
+      - docker push $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}}
+      - docker push $REGISTRY/$BASE_APP_NAME-slow:latest
+      - docker push $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}}
+      - docker push $REGISTRY/$BASE_APP_NAME-fast:latest
 
   deploy-fast:
     desc: Deploy fast proxy to fly.io

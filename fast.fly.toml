@@ -12,3 +12,6 @@ kill_timeout = 5
 
 [experimental]
   auto_rollback = true
+
+[[services]]
+  internal_port = 80
