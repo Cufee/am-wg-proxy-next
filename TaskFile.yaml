@@ -1,0 +1,49 @@
+# REGISTRY := registry.fly.io
+# VERSION = $(shell git rev-parse --short HEAD)
+
+# echo:
+# 	@echo "Tag:" ${REGISTRY}/${APP_NAME}:${VERSION}
+
+# build:
+# 	docker buildx build --platform linux/amd64 -t ${REGISTRY}/${APP_NAME}:${VERSION} -t ${TAG}:latest --push --secret id=ssh_priv,src=$(HOME)/.ssh/id_rsa --secret id=ssh_pub,src=$(HOME)/.ssh/id_rsa.pub .
+
+# deploy:
+# 	flyctl deploy --app ${APP_NAME} --image ${REGISTRY}/${APP_NAME}:${VERSION}
+
+# slow:
+# 	@cat slow.fly.toml > fly.toml
+# 	export APP_NAME=am-wg-proxy-slow
+
+# fast:
+# 	@cat slow.fly.toml > fly.toml
+# 	export APP_NAME=am-wg-proxy-fast
+
+version: "3"
+
+vars:
+  VERSION:
+    sh: git rev-parse --short HEAD
+
+env:
+  BASE_APP_NAME: am-wg-proxy
+  REGISTRY: registry.fly.io
+
+tasks:
+  build:
+    desc: Build images for fast and slow proxy
+    cmds:
+      - docker buildx build --platform linux/amd64 -t $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}} -t $REGISTRY/$BASE_APP_NAME-slow:latest -t $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}} -t $REGISTRY/$BASE_APP_NAME-fast:latest --push --secret id=ssh_priv,src=$HOME/.ssh/id_rsa --secret id=ssh_pub,src=$HOME/.ssh/id_rsa.pub .
+
+  deploy-fast:
+    desc: Deploy fast proxy to fly.io
+    cmds:
+      - cat fast.fly.toml > fly.toml
+      - flyctl deploy --app $BASE_APP_NAME-fast --image $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}}
+      - rm fly.toml
+
+  deploy-slow:
+    desc: Deploy slow proxy to fly.io
+    cmds:
+      - cat slow.fly.toml > fly.toml
+      - flyctl deploy --app $BASE_APP_NAME-slow --image $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}}
+      - rm fly.toml
