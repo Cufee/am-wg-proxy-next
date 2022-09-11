@@ -15,6 +15,11 @@ type VehiclesResponse struct {
 	Data map[string][]statistics.VehicleStatsFrame `json:"data"`
 }
 
+type VehicleAchievementsResponse struct {
+	api.Response
+	Data map[string]statistics.AchievementsFrame `json:"data"`
+}
+
 func GetAccountVehicles(realm string, id string) ([]statistics.VehicleStatsFrame, error) {
 	vehiclesMap, err := GetBulkAccountsVehicles(realm, id)
 	if err != nil {

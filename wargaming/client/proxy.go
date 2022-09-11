@@ -4,11 +4,16 @@ import (
 	"fmt"
 	"net/url"
 
+	"aftermath.link/repo/am-wg-proxy/logs"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 func getProxyBucketAndUrl(realm string) (*bucket, *url.URL, string, error) {
 	bkt := pickBucket()
+	if bkt.isDirect {
+		logs.Info("Using direct connection for realm %v", realm)
+		return bkt, nil, "", nil
+	}
 	return bkt, buildProxyURL(bkt.host, bkt.port, bkt.username, bkt.password), fmt.Sprintf("%s:%s", bkt.username, bkt.password), nil
 }
 

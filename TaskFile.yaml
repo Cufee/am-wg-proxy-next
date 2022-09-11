@@ -5,37 +5,19 @@ vars:
     sh: git rev-parse --short HEAD
 
 env:
-  BASE_APP_NAME: am-wg-proxy
-  REGISTRY: registry.fly.io
+  BASE_APP_NAME: am-wg-api
+  NAMESPACE: aftermath-wargaming
+  REGISTRY: ghcr.io/byvko-dev
+  K8S_TYPE: deployment
 
 tasks:
   build:
-    desc: Build and tag images for fast and slow proxy
+    desc: Build, tag and load the image
     cmds:
-      - docker buildx build --platform linux/amd64 -t $REGISTRY/$BASE_APP_NAME{{.VERSION}} --load --secret id=ssh_priv,src=$HOME/.ssh/id_rsa --secret id=ssh_pub,src=$HOME/.ssh/id_rsa.pub .
-      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}}
-      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-slow:latest
-      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}}
-      - docker tag $REGISTRY/$BASE_APP_NAME{{.VERSION}} $REGISTRY/$BASE_APP_NAME-fast:latest
+      - docker buildx build --platform linux/amd64 -t $REGISTRY/$BASE_APP_NAME:{{.VERSION}} -t $REGISTRY/$BASE_APP_NAME:latest --{{.CLI_ARGS | default "push"}} --secret id=ssh_priv,src=$HOME/.ssh/id_rsa --secret id=ssh_pub,src=$HOME/.ssh/id_rsa.pub .
 
-  push:
-    desc: Push images for fast and slow proxy
+  restart:
+    desc: Restart k8s deployment
     cmds:
-      - docker push $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}}
-      - docker push $REGISTRY/$BASE_APP_NAME-slow:latest
-      - docker push $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}}
-      - docker push $REGISTRY/$BASE_APP_NAME-fast:latest
-
-  deploy-fast:
-    desc: Deploy fast proxy to fly.io
-    cmds:
-      - cat fast.fly.toml > fly.toml
-      - flyctl deploy --app $BASE_APP_NAME-fast --image $REGISTRY/$BASE_APP_NAME-fast:{{.VERSION}}
-      - rm fly.toml
-
-  deploy-slow:
-    desc: Deploy slow proxy to fly.io
-    cmds:
-      - cat slow.fly.toml > fly.toml
-      - flyctl deploy --app $BASE_APP_NAME-slow --image $REGISTRY/$BASE_APP_NAME-slow:{{.VERSION}}
-      - rm fly.toml
+      - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME -n $NAMESPACE
+      - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME-cache -n $NAMESPACE

@@ -1,8 +1,6 @@
 package query
 
 import (
-	"strconv"
-
 	"aftermath.link/repo/am-wg-proxy/wargaming/handlers/clans"
 	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/gofiber/fiber/v2"
@@ -17,14 +15,8 @@ func AccountClanInfoHandler(c *fiber.Ctx) error {
 		response.Error.Message = "Player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-	playerId, err := strconv.Atoi(pid)
-	if err != nil {
-		response.Error.Message = "Invalid player id"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
 
-	result, err := clans.GetAccountClanInfo(realm, playerId)
+	result, err := clans.GetAccountClanInfo(realm, pid)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -65,14 +57,8 @@ func ClanInfoHandler(c *fiber.Ctx) error {
 		response.Error.Message = "Clan id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-	clanId, err := strconv.Atoi(cid)
-	if err != nil {
-		response.Error.Message = "Invalid clan id"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
 
-	result, err := clans.GetClanInfo(realm, clanId)
+	result, err := clans.GetClanInfo(realm, cid)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()

@@ -47,9 +47,19 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 	logs.Debug("WargamingRequest: %v %v", method, endpoint.String())
 
 	headers := make(map[string]string)
-	basic := "Basic " + base64.StdEncoding.EncodeToString([]byte(proxyAuth))
-	headers["Proxy-Authorization"] = basic
+	if proxyUrl != nil {
+		basic := "Basic " + base64.StdEncoding.EncodeToString([]byte(proxyAuth))
+		headers["Proxy-Authorization"] = basic
+	}
 
+	startTime := time.Now()
+	defer func() {
+		if bucket.responseTimes != nil {
+			go func() {
+				bucket.responseTimes <- int(time.Since(startTime) / time.Millisecond)
+			}()
+		}
+	}()
 	return client.HttpRequest(endpoint.String(), method, proxyUrl, nil, payload, target)
 }
 
