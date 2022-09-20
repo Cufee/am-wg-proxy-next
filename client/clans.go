@@ -5,12 +5,12 @@ import (
 	"github.com/byvko-dev/am-types/wargaming/v1/clans"
 )
 
-func (c *Client) GetClanByID(realm string, id int, useSlowProxy bool) (clans.CompleteProfile, *e.Error) {
+func (c *Client) GetClanByID(realm string, id int) (clans.CompleteProfile, *e.Error) {
 	var target clans.CompleteProfile
 	return target, c.sendRequest(realm, clansGetEndpointFMT.Fmt(id), &target, defaultRequestOptions)
 }
 
-func (c *Client) SearchClans(realm, query string, useSlowProxy bool) (clans.BasicProfile, *e.Error) {
+func (c *Client) SearchClans(realm, query string) (clans.BasicProfile, *e.Error) {
 	opts := defaultRequestOptions
 	opts.Query.Add("query", query)
 
