@@ -15,6 +15,7 @@ github.com/byvko-dev/am-core/logs
 # github.com/byvko-dev/am-types v1.5.3
 ## explicit; go 1.19
 github.com/byvko-dev/am-types/api/generic/v1
+github.com/byvko-dev/am-types/errors/v2
 github.com/byvko-dev/am-types/users/v1
 github.com/byvko-dev/am-types/wargaming/generic/api
 github.com/byvko-dev/am-types/wargaming/v1/accounts

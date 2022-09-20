@@ -1,4 +1,4 @@
-module aftermath.link/repo/am-wg-proxy
+module github.com/cufee/am-wg-proxy-next
 
 go 1.19
 

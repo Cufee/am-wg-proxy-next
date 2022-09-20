@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"aftermath.link/repo/am-wg-proxy/handlers/fast"
-	"aftermath.link/repo/am-wg-proxy/handlers/query"
-	"aftermath.link/repo/am-wg-proxy/logs"
 	"github.com/ansrivas/fiberprometheus/v2"
+	"github.com/cufee/am-wg-proxy-next/internal/handlers/fast"
+	"github.com/cufee/am-wg-proxy-next/internal/handlers/query"
+	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
