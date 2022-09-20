@@ -15,13 +15,13 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type client struct {
+type Client struct {
 	httpClient *http.Client
 	host       string
 }
 
-func NewClient(host string, timeout time.Duration) *client {
-	return &client{
+func NewClient(host string, timeout time.Duration) *Client {
+	return &Client{
 		httpClient: &http.Client{Timeout: timeout},
 		host:       host,
 	}
@@ -64,7 +64,7 @@ const (
 	bulkAccountAchievementsEndpoint endpoint = "/bulk/accounts/achievements"
 )
 
-func (c *client) sendRequest(realm string, path endpoint, target interface{}, optsInput ...requestOptions) *e.Error {
+func (c *Client) sendRequest(realm string, path endpoint, target interface{}, optsInput ...requestOptions) *e.Error {
 	opts := defaultRequestOptions
 	if len(optsInput) > 0 {
 		opts = optsInput[0]

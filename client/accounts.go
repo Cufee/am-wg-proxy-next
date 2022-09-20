@@ -9,7 +9,7 @@ import (
 	"github.com/byvko-dev/am-types/wargaming/v1/statistics"
 )
 
-func (c *client) SearchAccounts(realm, query string, useSlowProxy bool) (accounts.BaseProfile, *e.Error) {
+func (c *Client) SearchAccounts(realm, query string, useSlowProxy bool) (accounts.BaseProfile, *e.Error) {
 	opts := defaultRequestOptions
 	opts.Query.Add("query", query)
 
@@ -24,23 +24,23 @@ func (c *client) SearchAccounts(realm, query string, useSlowProxy bool) (account
 	return target[0], nil
 }
 
-func (c *client) GetAccountByID(id int, useSlowProxy bool) (accounts.CompleteProfile, *e.Error) {
+func (c *Client) GetAccountByID(id int, useSlowProxy bool) (accounts.CompleteProfile, *e.Error) {
 	var target accounts.CompleteProfile
 	return target, c.sendRequest(realmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, defaultRequestOptions)
 
 }
 
-func (c *client) GetAccountClan(id int, useSlowProxy bool) (clans.MemberProfile, *e.Error) {
+func (c *Client) GetAccountClan(id int, useSlowProxy bool) (clans.MemberProfile, *e.Error) {
 	var target clans.MemberProfile
 	return target, c.sendRequest(realmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, defaultRequestOptions)
 }
 
-func (c *client) GetAccountVehicles(id int, useSlowProxy bool) ([]statistics.VehicleStatsFrame, *e.Error) {
+func (c *Client) GetAccountVehicles(id int, useSlowProxy bool) ([]statistics.VehicleStatsFrame, *e.Error) {
 	var target []statistics.VehicleStatsFrame
 	return target, c.sendRequest(realmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, defaultRequestOptions)
 }
 
-func (c *client) GetAccountAchievements(id int, useSlowProxy bool) (statistics.AchievementsFrame, *e.Error) {
+func (c *Client) GetAccountAchievements(id int, useSlowProxy bool) (statistics.AchievementsFrame, *e.Error) {
 	var target statistics.AchievementsFrame
 	return target, c.sendRequest(realmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, defaultRequestOptions)
 }
