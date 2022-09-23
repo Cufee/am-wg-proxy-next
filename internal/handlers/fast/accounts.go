@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	api "github.com/byvko-dev/am-types/api/generic/v1"
+	"github.com/cufee/am-wg-proxy-next/helpers"
 	"github.com/cufee/am-wg-proxy-next/internal/shims"
-	"github.com/cufee/am-wg-proxy-next/internal/wargaming/helpers"
 	"github.com/gofiber/fiber/v2"
 )
 
