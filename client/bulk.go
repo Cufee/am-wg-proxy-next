@@ -1,7 +1,6 @@
 package client
 
 import (
-	"strconv"
 	"strings"
 
 	e "github.com/byvko-dev/am-types/errors/v2"
@@ -10,29 +9,21 @@ import (
 )
 
 // bulk.Get("/clans/info", query.BulkAccountsInfoHandler)
-func (c *Client) BulkGetClansByID(ids []int, realm string) ([]clans.CompleteProfile, *e.Error) {
-	var target []clans.CompleteProfile
+func (c *Client) BulkGetClansByID(ids []string, realm string) (map[string]clans.CompleteProfile, *e.Error) {
+	var target map[string]clans.CompleteProfile
 
 	opts := defaultRequestOptions
-	idsStr := make([]string, len(ids))
-	for i, id := range ids {
-		idsStr[i] = strconv.Itoa(id)
-	}
-	opts.Query.Add("ids", strings.Join(idsStr, ","))
+	opts.Query.Add("ids", strings.Join(ids, ","))
 
 	return target, c.sendRequest(realm, bulkAccountInfoEndpoint, &target, opts)
 }
 
 // bulk.Get("/accounts/info", query.BulkAccountsInfoHandler)
-func (c *Client) BulkGetAccountsByID(ids []int, realm string) ([]accounts.CompleteProfile, *e.Error) {
-	var target []accounts.CompleteProfile
+func (c *Client) BulkGetAccountsByID(ids []string, realm string) (map[string]accounts.CompleteProfile, *e.Error) {
+	var target map[string]accounts.CompleteProfile
 
 	opts := defaultRequestOptions
-	idsStr := make([]string, len(ids))
-	for i, id := range ids {
-		idsStr[i] = strconv.Itoa(id)
-	}
-	opts.Query.Add("ids", strings.Join(idsStr, ","))
+	opts.Query.Add("ids", strings.Join(ids, ","))
 
 	return target, c.sendRequest(realm, bulkAccountInfoEndpoint, &target, opts)
 }
