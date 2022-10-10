@@ -60,7 +60,6 @@ const (
 
 	bulkClanInfoEndpoint            endpoint = "/bulk/clans/info"
 	bulkAccountInfoEndpoint         endpoint = "/bulk/accounts/info"
-	bulkAccountVehiclesEndpoint     endpoint = "/bulk/accounts/vehicles"
 	bulkAccountAchievementsEndpoint endpoint = "/bulk/accounts/achievements"
 )
 

@@ -3,7 +3,6 @@ package accounts
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/byvko-dev/am-types/wargaming/generic/api"
 	"github.com/byvko-dev/am-types/wargaming/v1/statistics"
@@ -21,26 +20,18 @@ type VehicleAchievementsResponse struct {
 }
 
 func GetAccountVehicles(realm string, id string) ([]statistics.VehicleStatsFrame, error) {
-	vehiclesMap, err := GetBulkAccountsVehicles(realm, id)
-	if err != nil {
-		return nil, err
-	}
-
-	info, ok := vehiclesMap[id]
-	if !ok {
-		return info, errors.New("account not found")
-	}
-	return info, nil
-}
-
-func GetBulkAccountsVehicles(realm string, ids ...string) (map[string][]statistics.VehicleStatsFrame, error) {
 	var response VehiclesResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("tanks/stats/?account_id=%s", strings.Join(ids, ",")), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("tanks/stats/?account_id=%s", id), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
 	if response.Error.Code != 0 {
 		return nil, errors.New(response.Error.Message)
 	}
-	return response.Data, nil
+
+	info, ok := response.Data[id]
+	if !ok {
+		return info, errors.New("account not found")
+	}
+	return info, nil
 }

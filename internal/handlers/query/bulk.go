@@ -29,27 +29,6 @@ func BulkAccountsInfoHandler(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func BulkAccountsVehiclesHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
-
-	pids := c.Query("ids")
-	realm := c.Params("realm")
-	if pids == "" || realm == "" {
-		response.Error.Message = "Player id and realm are required"
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
-
-	result, err := accounts.GetBulkAccountsVehicles(realm, pids)
-	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
-	}
-
-	response.Data = result
-	return c.JSON(response)
-}
-
 func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
 	var response api.ResponseWithError
 
