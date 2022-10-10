@@ -27,7 +27,6 @@ func (c *Client) SearchAccounts(realm, query string) (accounts.BaseProfile, *e.E
 func (c *Client) GetAccountByID(id int) (accounts.CompleteProfile, *e.Error) {
 	var target accounts.CompleteProfile
 	return target, c.sendRequest(realmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, defaultRequestOptions)
-
 }
 
 func (c *Client) GetAccountClan(id int) (clans.MemberProfile, *e.Error) {

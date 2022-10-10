@@ -53,7 +53,7 @@ const (
 	clansSearchEndpoint endpoint = "/clans/search"
 	clansGetEndpointFMT endpoint = "/clans/%v"
 
-	glossaryOneVehicleEndpoitFMT        endpoint = "/glossary/vehicles/%v"
+	glossaryOneVehicleEndpointFMT       endpoint = "/glossary/vehicles/%v"
 	glossaryManyVehiclesEndpointFMT     endpoint = "/glossary/vehicles"
 	glossaryOneAchievementEndpointFMT   endpoint = "/glossary/achievements/%v"
 	glossaryManyAchievementsEndpointFMT endpoint = "/glossary/achievements"
