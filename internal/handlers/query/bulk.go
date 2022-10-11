@@ -50,6 +50,26 @@ func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
+func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
+	var response api.ResponseWithError
+
+	cids := c.Query("ids")
+	realm := c.Params("realm")
+	if cids == "" || realm == "" {
+		response.Error.Message = "Clan id and realm are required"
+		return c.Status(fiber.StatusBadRequest).JSON(response)
+	}
+	result, err := clans.GetBulkAccountClanInfo(realm, cids)
+	if err != nil {
+		response.Error.Message = "Nothing found"
+		response.Error.Context = err.Error()
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	response.Data = result
+	return c.JSON(response)
+}
+
 func BulkClanInfoHandler(c *fiber.Ctx) error {
 	var response api.ResponseWithError
 

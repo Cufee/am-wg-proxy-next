@@ -38,3 +38,13 @@ func (c *Client) BulkGetAccountsAchievements(ids []string, realm string) (map[st
 
 	return target, c.sendRequest(realm, bulkAccountAchievementsEndpoint, &target, opts)
 }
+
+// bulk.Get("/accounts/clan", query.BulkAccountClanInfoHandler)
+func (c *Client) BulkGetAccountsClans(ids []string, realm string) (map[string]clans.MemberProfile, *e.Error) {
+	var target map[string]clans.MemberProfile
+
+	opts := defaultRequestOptions
+	opts.Query.Add("ids", strings.Join(ids, ","))
+
+	return target, c.sendRequest(realm, bulkAccountClanInfoEndpoint, &target, opts)
+}
