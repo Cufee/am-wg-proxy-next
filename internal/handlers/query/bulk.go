@@ -59,11 +59,12 @@ func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
 		response.Error.Message = "Clan id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
+
 	result, err := clans.GetBulkAccountClanInfo(realm, cids)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
+		return c.Status(fiber.StatusNotFound).JSON(response)
 	}
 
 	response.Data = result

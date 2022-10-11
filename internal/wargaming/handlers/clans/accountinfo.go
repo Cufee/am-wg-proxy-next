@@ -3,6 +3,7 @@ package clans
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/byvko-dev/am-types/wargaming/generic/api"
 	"github.com/byvko-dev/am-types/wargaming/v1/clans"
@@ -29,7 +30,7 @@ func GetAccountClanInfo(realm string, playerId string) (clans.MemberProfile, err
 
 func GetBulkAccountClanInfo(realm string, ids ...string) (map[string]clans.MemberProfile, error) {
 	var response AccountClanInfoResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/accountinfo/?account_id=%v&extra=clan", ids), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/accountinfo/?account_id=%v&extra=clan", strings.Join(ids, ",")), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
