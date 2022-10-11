@@ -21,3 +21,13 @@ tasks:
     cmds:
       - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME -n $NAMESPACE
       - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME-cache -n $NAMESPACE
+
+  tag:
+    desc: Tag the current commit
+    cmds:
+      - git tag -a {{.CLI_ARGS}} -m "Version {{.CLI_ARGS}}"
+      - git push --tags
+  tags:
+    desc: Get the latest git tag
+    cmds:
+      - git describe --abbrev=0
