@@ -12,18 +12,30 @@ import (
 
 	api "github.com/byvko-dev/am-types/api/generic/v1"
 	e "github.com/byvko-dev/am-types/errors/v2"
+	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 type Client struct {
+	debug      bool
 	httpClient *http.Client
 	host       string
 }
 
-func NewClient(host string, timeout time.Duration) *Client {
+type ClientOptons struct {
+	Debug bool
+}
+
+func NewClient(host string, timeout time.Duration, opts ...ClientOptons) *Client {
+	var debug bool
+	if len(opts) > 0 {
+		debug = opts[0].Debug
+	}
+
 	return &Client{
 		httpClient: &http.Client{Timeout: timeout},
 		host:       host,
+		debug:      debug,
 	}
 }
 
@@ -77,10 +89,18 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	}
 	urlData.RawQuery = opts.Query.Encode()
 
+	if c.debug {
+		logs.Debug("Sending request to %s", urlData.String())
+	}
+
 	// Send request
 	resp, err := globalClient.Get(urlData.String())
 	if err != nil {
 		return e.Internal(err, "Failed to send request")
+	}
+
+	if c.debug {
+		logs.Debug("Got response with status %s", resp.Status)
 	}
 
 	// Error checks
@@ -96,6 +116,9 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 
 	// Header and status checks
 	if resp.Header.Get("Content-Type") != "application/json" {
+		if c.debug {
+			logs.Debug("Response is not JSON. Response body: %s", string(body))
+		}
 		return e.Internal(errors.New("response is not JSON"), string(body))
 	}
 	if resp.StatusCode != http.StatusOK {
