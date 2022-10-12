@@ -43,8 +43,11 @@ type requestOptions struct {
 	Query url.Values
 }
 
-var defaultRequestOptions = requestOptions{
-	Query: url.Values{},
+func newDefaultRequestOptions() requestOptions {
+	defaultRequestOptions := requestOptions{
+		Query: url.Values{},
+	}
+	return defaultRequestOptions
 }
 
 var globalClient = &http.Client{Timeout: time.Second * 3}
@@ -77,7 +80,7 @@ const (
 )
 
 func (c *Client) sendRequest(realm string, path endpoint, target interface{}, optsInput ...requestOptions) *e.Error {
-	opts := defaultRequestOptions
+	opts := newDefaultRequestOptions()
 	if len(optsInput) > 0 {
 		opts = optsInput[0]
 	}

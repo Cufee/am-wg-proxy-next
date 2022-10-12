@@ -7,11 +7,11 @@ import (
 
 func (c *Client) GetClanByID(realm string, id int) (clans.CompleteProfile, *e.Error) {
 	var target clans.CompleteProfile
-	return target, c.sendRequest(realm, clansGetEndpointFMT.Fmt(id), &target, defaultRequestOptions)
+	return target, c.sendRequest(realm, clansGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func (c *Client) SearchClans(realm, query string) (clans.BasicProfile, *e.Error) {
-	opts := defaultRequestOptions
+	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 
 	var target []clans.BasicProfile

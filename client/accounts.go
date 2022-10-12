@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Client) SearchAccounts(realm, query string) (accounts.BaseProfile, *e.Error) {
-	opts := defaultRequestOptions
+	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 
 	var target []accounts.BaseProfile
@@ -26,22 +26,22 @@ func (c *Client) SearchAccounts(realm, query string) (accounts.BaseProfile, *e.E
 
 func (c *Client) GetAccountByID(id int) (accounts.CompleteProfile, *e.Error) {
 	var target accounts.CompleteProfile
-	return target, c.sendRequest(realmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, defaultRequestOptions)
+	return target, c.sendRequest(realmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func (c *Client) GetAccountClan(id int) (clans.MemberProfile, *e.Error) {
 	var target clans.MemberProfile
-	return target, c.sendRequest(realmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, defaultRequestOptions)
+	return target, c.sendRequest(realmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func (c *Client) GetAccountVehicles(id int) ([]statistics.VehicleStatsFrame, *e.Error) {
 	var target []statistics.VehicleStatsFrame
-	return target, c.sendRequest(realmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, defaultRequestOptions)
+	return target, c.sendRequest(realmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func (c *Client) GetAccountAchievements(id int) (statistics.AchievementsFrame, *e.Error) {
 	var target statistics.AchievementsFrame
-	return target, c.sendRequest(realmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, defaultRequestOptions)
+	return target, c.sendRequest(realmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func realmFromPlayerID(id int) string {
