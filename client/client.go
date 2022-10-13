@@ -39,6 +39,10 @@ func NewClient(host string, timeout time.Duration, opts ...ClientOptons) *Client
 	}
 }
 
+func (c *Client) Close() {
+	c.httpClient.CloseIdleConnections()
+}
+
 type requestOptions struct {
 	Query url.Values
 }
@@ -49,8 +53,6 @@ func newDefaultRequestOptions() requestOptions {
 	}
 	return defaultRequestOptions
 }
-
-var globalClient = &http.Client{Timeout: time.Second * 3}
 
 type endpoint string
 
@@ -97,7 +99,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	}
 
 	// Send request
-	resp, err := globalClient.Get(urlData.String())
+	resp, err := c.httpClient.Get(urlData.String())
 	if err != nil {
 		return e.Internal(err, "Failed to send request")
 	}
