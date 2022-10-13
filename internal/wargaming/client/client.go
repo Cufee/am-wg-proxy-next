@@ -22,12 +22,10 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 	start := time.Now()
 	bucket.channel <- 1
 	defer func() {
-		go func() {
-			if time.Since(start) < time.Second {
-				time.Sleep(time.Second - time.Since(start))
-			}
-			<-bucket.channel
-		}()
+		if time.Since(start) < time.Second {
+			time.Sleep(time.Second - time.Since(start))
+		}
+		<-bucket.channel
 	}()
 
 	baseUri, err := baseUriFromRealm(realm)
@@ -55,9 +53,7 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 	startTime := time.Now()
 	defer func() {
 		if bucket.responseTimes != nil {
-			go func() {
-				bucket.responseTimes <- int(time.Since(startTime) / time.Millisecond)
-			}()
+			bucket.responseTimes <- int(time.Since(startTime) / time.Millisecond)
 		}
 	}()
 	return client.HttpRequest(endpoint.String(), method, proxyUrl, nil, payload, target)
@@ -65,8 +61,6 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 
 func baseUriFromRealm(realm string) (string, error) {
 	switch strings.ToUpper(realm) {
-	case "RU":
-		return "https://api.wotblitz.ru/wotb/", nil
 	case "EU":
 		return "https://api.wotblitz.eu/wotb/", nil
 	case "NA":

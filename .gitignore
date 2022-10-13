@@ -2,3 +2,6 @@
 tmp
 .vscode
 vendor
+
+heap
+profile*

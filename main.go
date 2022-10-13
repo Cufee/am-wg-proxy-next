@@ -1,18 +1,30 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
-	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/cufee/am-wg-proxy-next/internal/handlers/fast"
 	"github.com/cufee/am-wg-proxy-next/internal/handlers/query"
 	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+
+	_ "net/http/pprof"
+
+	pf "github.com/pkg/profile"
 )
 
 func main() {
+	defer pf.Start(pf.MemProfile).Stop()
+	go func() {
+		err := http.ListenAndServe(":8024", nil)
+		if err != nil {
+			logs.Error("Failed at http server: %+v", err)
+		}
+	}()
+
 	// Setup a server
 	app := fiber.New()
 
@@ -20,10 +32,6 @@ func main() {
 		EnableStackTrace: true,
 	}))
 	app.Use(logger.New())
-
-	prometheus := fiberprometheus.New("am-wg-api")
-	prometheus.RegisterAt(app, "/metrics")
-	app.Use(prometheus.Middleware)
 
 	v1 := app.Group("/v1")
 
@@ -63,6 +71,8 @@ func main() {
 	bulk.Get("/accounts/achievements", query.BulkAccountsAchievementsHandler)
 
 	logs.Fatal("Failed to start a server: %v", app.Listen(":"+os.Getenv("PORT")))
+
+	select {}
 }
 
 func dummyHandlerFunc(c *fiber.Ctx) error {

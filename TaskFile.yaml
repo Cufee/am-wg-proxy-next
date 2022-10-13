@@ -5,9 +5,9 @@ vars:
     sh: git rev-parse --short HEAD
 
 env:
-  BASE_APP_NAME: am-wg-api
+  BASE_APP_NAME: am-wg-proxy
   NAMESPACE: aftermath-wargaming
-  REGISTRY: ghcr.io/byvko-dev
+  REGISTRY: us-east4-docker.pkg.dev/aftermath-327212/aftermath-images
   K8S_TYPE: deployment
 
 tasks:
@@ -19,8 +19,7 @@ tasks:
   restart:
     desc: Restart k8s deployment
     cmds:
-      - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME -n $NAMESPACE
-      - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME-cache -n $NAMESPACE
+      - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME-internal -n $NAMESPACE
 
   tag:
     desc: Tag the current commit

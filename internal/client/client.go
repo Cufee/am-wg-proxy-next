@@ -62,17 +62,19 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 		logs.Error(logs.Wrap(err, "client.Do failed").Error())
 		return 0, errors.New("client.Do returned nil response")
 	}
+	defer resp.Body.Close()
 	if err != nil {
 		return resp.StatusCode, logs.Wrap(err, "client.Do failed")
 	}
-	// Read body
-	bodyBytes, err = io.ReadAll(resp.Body)
-	if err != nil {
-		return resp.StatusCode, errors.Wrap(err, "ioutil.ReadAll failed")
-	}
 
-	// Decode
 	if target != nil {
+		// Read body
+		bodyBytes, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return resp.StatusCode, errors.Wrap(err, "ioutil.ReadAll failed")
+		}
+
+		// Decode
 		err = json.Unmarshal(bodyBytes, target)
 		if err != nil {
 			return resp.StatusCode, errors.Wrap(err, "json.Unmarshal failed")
