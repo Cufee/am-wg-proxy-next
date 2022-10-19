@@ -100,6 +100,11 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 
 	// Send request
 	resp, err := c.httpClient.Get(urlData.String())
+	// Error checks
+	if resp == nil {
+		return e.Internal(errors.New("response is nil"), "Failed to send request")
+	}
+	defer resp.Body.Close()
 	if err != nil {
 		return e.Internal(err, "Failed to send request")
 	}
@@ -107,12 +112,6 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	if c.debug {
 		logs.Debug("Got response with status %s", resp.Status)
 	}
-
-	// Error checks
-	if resp == nil {
-		return e.Internal(errors.New("response is nil"), "Failed to send request")
-	}
-	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

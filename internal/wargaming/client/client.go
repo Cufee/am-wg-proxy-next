@@ -14,18 +14,22 @@ import (
 
 // Application ID will be added to query string here
 func WargamingRequest(realm, path, method string, payload []byte, target interface{}) (int, error) {
-	bucket, proxyUrl, proxyAuth, err := getProxyBucketAndUrl(realm)
+	proxyUrl, proxyAuth, wgAppId, err := getProxyInfo(realm)
 	if err != nil {
 		return 0, err
 	}
 
+	limiter <- 1
 	start := time.Now()
-	bucket.channel <- 1
 	defer func() {
-		if time.Since(start) < time.Second {
-			time.Sleep(time.Second - time.Since(start))
-		}
-		<-bucket.channel
+		go func() {
+
+			duration := time.Since(start)
+			if duration < time.Second {
+				time.Sleep(time.Second - duration)
+			}
+			<-limiter
+		}()
 	}()
 
 	baseUri, err := baseUriFromRealm(realm)
@@ -39,7 +43,7 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 	}
 
 	query := endpoint.Query()
-	query.Set("application_id", bucket.wgAppId)
+	query.Set("application_id", wgAppId)
 	endpoint.RawQuery = query.Encode()
 
 	logs.Debug("WargamingRequest: %v %v", method, endpoint.String())
@@ -50,13 +54,8 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 		headers["Proxy-Authorization"] = basic
 	}
 
-	startTime := time.Now()
-	defer func() {
-		if bucket.responseTimes != nil {
-			bucket.responseTimes <- int(time.Since(startTime) / time.Millisecond)
-		}
-	}()
 	return client.HttpRequest(endpoint.String(), method, proxyUrl, nil, payload, target)
+
 }
 
 func baseUriFromRealm(realm string) (string, error) {

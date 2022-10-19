@@ -11,7 +11,7 @@ require (
 	github.com/byvko-dev/am-core v1.2.9
 	github.com/byvko-dev/am-types v1.5.3
 	github.com/pkg/errors v0.9.1
-	github.com/pkg/profile v1.6.0
+	golang.org/x/time v0.1.0
 )
 
 require (

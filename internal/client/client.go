@@ -57,6 +57,7 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 		Timeout:   30 * time.Second,
 		Transport: transport,
 	}
+	defer client.CloseIdleConnections()
 	resp, err = client.Do(req)
 	if resp == nil {
 		logs.Error(logs.Wrap(err, "client.Do failed").Error())
