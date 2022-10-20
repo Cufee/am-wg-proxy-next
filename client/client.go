@@ -70,10 +70,10 @@ const (
 	clansSearchEndpoint endpoint = "/clans/search"
 	clansGetEndpointFMT endpoint = "/clans/%v"
 
-	glossaryOneVehicleEndpointFMT       endpoint = "/glossary/vehicles/%v"
-	glossaryManyVehiclesEndpointFMT     endpoint = "/glossary/vehicles"
-	glossaryOneAchievementEndpointFMT   endpoint = "/glossary/achievements/%v"
-	glossaryManyAchievementsEndpointFMT endpoint = "/glossary/achievements"
+	glossaryOneVehicleEndpointFMT     endpoint = "/glossary/vehicles/%v"
+	glossaryManyVehiclesEndpoint      endpoint = "/glossary/vehicles"
+	glossaryOneAchievementEndpointFMT endpoint = "/glossary/achievements/%v"
+	glossaryManyAchievementsEndpoint  endpoint = "/glossary/achievements"
 
 	bulkClanInfoEndpoint            endpoint = "/bulk/clans/info"
 	bulkAccountInfoEndpoint         endpoint = "/bulk/accounts/info"

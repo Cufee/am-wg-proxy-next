@@ -23,7 +23,6 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 	start := time.Now()
 	defer func() {
 		go func() {
-
 			duration := time.Since(start)
 			if duration < time.Second {
 				time.Sleep(time.Second - duration)
