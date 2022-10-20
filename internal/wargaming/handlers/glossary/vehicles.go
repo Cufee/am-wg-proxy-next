@@ -14,9 +14,9 @@ type GlossaryVehicleResponse struct {
 	Data map[string]glossary.VehicleDetails `json:"data"`
 }
 
-func GetGlossaryVehicle(realm string, vehicleID string) (glossary.VehicleDetails, error) {
+func GetGlossaryVehicle(realm string, vehicleID, lang string) (glossary.VehicleDetails, error) {
 	var response GlossaryVehicleResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("encyclopedia/vehicles/?tank_id=%v&fields=tank_id,name,nation,tier,type,is_premium", vehicleID), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("encyclopedia/vehicles/?tank_id=%v&fields=tank_id,name,nation,tier,type,is_premium&language=%v", vehicleID, lang), "GET", nil, &response)
 	if err != nil {
 		return glossary.VehicleDetails{}, err
 	}
@@ -31,9 +31,9 @@ func GetGlossaryVehicle(realm string, vehicleID string) (glossary.VehicleDetails
 	return info, nil
 }
 
-func GetAllGlossaryVehicles(realm string) (map[string]glossary.VehicleDetails, error) {
+func GetAllGlossaryVehicles(realm, lang string) (map[string]glossary.VehicleDetails, error) {
 	var response GlossaryVehicleResponse
-	_, err := client.WargamingRequest(realm, "encyclopedia/vehicles/?fields=tank_id,name,nation,tier,type,is_premium", "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("encyclopedia/vehicles/?fields=tank_id,name,nation,tier,type,is_premium&language=%v", lang), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

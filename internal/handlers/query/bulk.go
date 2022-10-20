@@ -4,7 +4,6 @@ import (
 	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/accounts"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/clans"
-	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/glossary"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -81,26 +80,6 @@ func BulkClanInfoHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 	result, err := clans.GetBulkClanInfo(realm, cids)
-	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
-	}
-
-	response.Data = result
-	return c.JSON(response)
-}
-
-func AllVehiclesGlossaryHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
-
-	realm := c.Params("realm")
-	if realm == "" {
-		response.Error.Message = "realm is required"
-		return c.Status(fiber.StatusBadRequest).JSON(response)
-	}
-
-	result, err := glossary.GetAllGlossaryVehicles(realm)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
