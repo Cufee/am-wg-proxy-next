@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	e "github.com/byvko-dev/am-types/errors/v2"
-	"github.com/byvko-dev/am-types/wargaming/v1/glossary"
+	"github.com/byvko-dev/am-types/wargaming/v2/glossary"
 	"github.com/cufee/am-wg-proxy-next/helpers"
 )
 

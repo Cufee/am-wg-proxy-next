@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	e "github.com/byvko-dev/am-types/errors/v2"
-	"github.com/byvko-dev/am-types/wargaming/v1/accounts"
-	"github.com/byvko-dev/am-types/wargaming/v1/clans"
+	"github.com/byvko-dev/am-types/wargaming/v2/accounts"
+	"github.com/byvko-dev/am-types/wargaming/v2/clans"
 	"github.com/byvko-dev/am-types/wargaming/v2/statistics"
 )
 
