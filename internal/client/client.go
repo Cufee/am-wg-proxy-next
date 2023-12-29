@@ -24,7 +24,6 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 		if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 			logs.Warning("URL: %v", url)
 			logs.Warning("Proxy: %v", proxy)
-			logs.Warning("Headers: %v", headers)
 			logs.Warning("Payload: %v", string(payload))
 			logs.Warning("Response: %v", string(bodyBytes))
 			logs.Warning("Error: %v", err)

@@ -21,11 +21,11 @@ type Client struct {
 	host       string
 }
 
-type ClientOptons struct {
+type ClientOptions struct {
 	Debug bool
 }
 
-func NewClient(host string, timeout time.Duration, opts ...ClientOptons) *Client {
+func NewClient(host string, timeout time.Duration, opts ...ClientOptions) *Client {
 	var debug bool
 	if len(opts) > 0 {
 		debug = opts[0].Debug

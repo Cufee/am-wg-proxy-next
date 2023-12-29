@@ -3,7 +3,6 @@ package client
 import (
 	"strconv"
 
-	"github.com/cufee/am-wg-proxy-next/helpers"
 	"github.com/cufee/am-wg-proxy-next/types"
 )
 
@@ -17,7 +16,7 @@ import (
 func (c *Client) GetOneVehicleGlossary(vehicleId int, lang string) (types.VehicleDetails, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", strconv.Itoa(vehicleId))
-	opts.Query.Add("language", helpers.GetLanguageCode(lang))
+	opts.Query.Add("language", types.GetLocale(lang))
 
 	var target types.VehicleDetails
 	return target, c.sendRequest("EU", glossaryManyVehiclesEndpoint, &target, opts)
@@ -26,7 +25,7 @@ func (c *Client) GetOneVehicleGlossary(vehicleId int, lang string) (types.Vehicl
 // glossary.Get("/vehicles", query.AllVehiclesGlossaryHandler)
 func (c *Client) GetVehiclesGlossary(lang string) (map[string]types.VehicleDetails, error) {
 	opts := newDefaultRequestOptions()
-	opts.Query.Add("language", helpers.GetLanguageCode(lang))
+	opts.Query.Add("language", types.GetLocale(lang))
 
 	var target map[string]types.VehicleDetails
 	return target, c.sendRequest("EU", glossaryManyVehiclesEndpoint, &target, opts)
