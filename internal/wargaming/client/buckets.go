@@ -1,59 +1,82 @@
 package client
 
 import (
+	"net/url"
+	"os"
 	"strconv"
 	"strings"
-	"sync/atomic"
+	"sync"
+	"time"
 
+	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	"github.com/cufee/am-wg-proxy-next/internal/utils"
+
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type bucket struct {
-	channel  chan int
+type proxyBucket struct {
+	rps      int
 	host     string
 	port     string
 	username string
 	password string
-	wgAppId  string
+
+	realm   string
+	wgAppId string
+
+	mu             sync.Mutex
+	ticker         *time.Ticker
+	activeRequests int
+
+	proxyUrl   *url.URL
+	authHeader string
 }
 
-var limiter chan int
-var rpsBuckets []bucket
-var lastBucketIndex int32
+func (b *proxyBucket) waitForTick() {
+	logs.Debug("Waiting for tick in bucket %v", b.realm)
+
+	b.mu.Lock()
+	b.activeRequests++
+	b.mu.Unlock()
+	<-b.ticker.C
+}
+
+func (b *proxyBucket) onComplete() {
+	b.mu.Lock()
+	b.activeRequests--
+	b.mu.Unlock()
+
+	logs.Debug("Completed request in bucket %v", b.realm)
+}
+
+var proxyBuckets map[string][]*proxyBucket = make(map[string][]*proxyBucket)
 
 func init() {
-	// Setup fast buckets
-	proxyHostList := strings.Split(utils.MustGetEnv("PROXY_HOST_LIST"), ",")
-	pass := utils.MustGetEnv("PROXY_PASSWORD")
-	user := utils.MustGetEnv("PROXY_USERNAME")
-	wgAppID := utils.MustGetEnv("PROXY_WG_APP_ID")
-	for _, host := range proxyHostList {
-		port := strings.Split(host, ":")[1]
-		host = strings.Split(host, ":")[0]
-		rpsBuckets = append(rpsBuckets, bucket{
-			channel:  make(chan int, 10),
-			host:     host,
-			port:     port,
-			username: user,
-			password: pass,
-			wgAppId:  wgAppID,
-		})
+	// Get fallback settings
+	fallbackWgAppId := utils.MustGetEnv("FALLBACK_WG_APP_ID")
+	fallbackRps, err := strconv.Atoi(utils.MustGetEnv("FALLBACK_MAX_RPS"))
+	if err != nil || fallbackRps == 0 {
+		panic("FALLBACK_MAX_RPS is not a number")
 	}
 
-	maxRps := utils.MustGetEnv("PROXY_HOST_MAX_RPS")
-	rpsPerHost, err := strconv.Atoi(maxRps)
-	if err != nil {
-		panic("PROXY_HOST_MAX_RPS is not a number")
+	fallbackBucket := &proxyBucket{
+		mu:             sync.Mutex{},
+		rps:            fallbackRps,
+		wgAppId:        fallbackWgAppId,
+		ticker:         time.NewTicker(time.Second / time.Duration(fallbackRps)),
+		activeRequests: fallbackRps * 100, // Make sure this bucket is never picked
 	}
-	limiter = make(chan int, rpsPerHost*len(rpsBuckets))
-}
+	proxyBuckets["*"] = append(proxyBuckets["*"], fallbackBucket)
 
-func pickBucket() bucket {
-	nextIndex := lastBucketIndex + 1
-	if int(nextIndex) >= len(rpsBuckets) {
-		nextIndex = 0
+	// Parse proxy settings
+	for _, proxyString := range strings.Split(os.Getenv("PROXY_HOST_LIST"), ",") {
+		bucketSettings, err := parseProxySettings(proxyString, fallbackWgAppId, fallbackRps)
+		if err != nil {
+			panic(err)
+		}
+		if bucketSettings.realm == "" {
+			proxyBuckets["*"] = append(proxyBuckets["*"], bucketSettings)
+		}
+		proxyBuckets[bucketSettings.realm] = append(proxyBuckets[bucketSettings.realm], bucketSettings)
 	}
-	atomic.StoreInt32(&lastBucketIndex, int32(nextIndex))
-	return rpsBuckets[nextIndex]
 }

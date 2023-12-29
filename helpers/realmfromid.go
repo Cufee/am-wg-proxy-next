@@ -11,6 +11,6 @@ func RealmFromID(pidInt int) string {
 	case pidInt < 2000000000:
 		return "NA"
 	default:
-		return "ASIA"
+		return "AS"
 	}
 }

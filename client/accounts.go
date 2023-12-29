@@ -52,6 +52,6 @@ func realmFromPlayerID(id int) string {
 	case id < 2000000000:
 		return "NA"
 	default:
-		return "ASIA"
+		return "AS"
 	}
 }

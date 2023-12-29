@@ -1,35 +1,23 @@
 package client
 
 import (
-	"encoding/base64"
 	"errors"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/cufee/am-wg-proxy-next/internal/client"
 	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	_ "github.com/joho/godotenv/autoload"
 )
 
-// Application ID will be added to query string here
 func WargamingRequest(realm, path, method string, payload []byte, target interface{}) (int, error) {
-	proxyUrl, proxyAuth, wgAppId, err := getProxyInfo(realm)
+	bkt, err := pickBucket(realm)
 	if err != nil {
 		return 0, err
 	}
 
-	limiter <- 1
-	start := time.Now()
-	defer func() {
-		go func() {
-			duration := time.Since(start)
-			if duration < time.Second {
-				time.Sleep(time.Second - duration)
-			}
-			<-limiter
-		}()
-	}()
+	bkt.waitForTick()
+	defer bkt.onComplete()
 
 	baseUri, err := baseUriFromRealm(realm)
 	if err != nil {
@@ -42,19 +30,17 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 	}
 
 	query := endpoint.Query()
-	query.Set("application_id", wgAppId)
+	query.Set("application_id", bkt.wgAppId)
 	endpoint.RawQuery = query.Encode()
 
 	logs.Debug("WargamingRequest: %v %v", method, endpoint.String())
 
 	headers := make(map[string]string)
-	if proxyUrl != nil {
-		basic := "Basic " + base64.StdEncoding.EncodeToString([]byte(proxyAuth))
-		headers["Proxy-Authorization"] = basic
+	if bkt.proxyUrl != nil {
+		headers["Proxy-Authorization"] = bkt.authHeader
 	}
 
-	return client.HttpRequest(endpoint.String(), method, proxyUrl, nil, payload, target)
-
+	return client.HttpRequest(endpoint.String(), method, bkt.proxyUrl, nil, payload, target)
 }
 
 func baseUriFromRealm(realm string) (string, error) {
@@ -63,8 +49,6 @@ func baseUriFromRealm(realm string) (string, error) {
 		return "https://api.wotblitz.eu/wotb/", nil
 	case "NA":
 		return "https://api.wotblitz.com/wotb/", nil
-	case "ASIA":
-		fallthrough
 	case "AS":
 		return "https://api.wotblitz.asia/wotb/", nil
 	default:

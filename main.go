@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	_ "github.com/joho/godotenv/autoload"
+
 	"github.com/cufee/am-wg-proxy-next/internal/handlers/fast"
 	"github.com/cufee/am-wg-proxy-next/internal/handlers/query"
 	"github.com/cufee/am-wg-proxy-next/internal/logs"

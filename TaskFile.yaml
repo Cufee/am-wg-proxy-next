@@ -1,25 +1,20 @@
 version: "3"
 
-vars:
-  VERSION:
-    sh: git rev-parse --short HEAD
-
-env:
-  BASE_APP_NAME: am-wg-proxy
-  NAMESPACE: aftermath-wargaming
-  REGISTRY: us-east4-docker.pkg.dev/aftermath-327212/aftermath-images
-  K8S_TYPE: deployment
+dotenv: ['.env']
 
 tasks:
-  build:
-    desc: Build, tag and load the image
+  dev:
+    desc: Run the application in development mode with hot reload
     cmds:
-      - docker buildx build --platform linux/amd64 -t $REGISTRY/$BASE_APP_NAME:{{.VERSION}} -t $REGISTRY/$BASE_APP_NAME:latest --{{.CLI_ARGS | default "push"}} --secret id=ssh_priv,src=$HOME/.ssh/id_rsa --secret id=ssh_pub,src=$HOME/.ssh/id_rsa.pub .
-
-  restart:
-    desc: Restart k8s deployment
+      - air
+  test:
+    desc: Run tests
     cmds:
-      - kubectl rollout restart $K8S_TYPE/$BASE_APP_NAME-internal -n $NAMESPACE
+      - go test ./... -v          
+  upgrade:
+    desc: Upgrade dependencies
+    cmds:
+      - go get -u ./...
 
   tag:
     desc: Tag the current commit
