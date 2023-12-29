@@ -1,0 +1,1 @@
+# Wargaming API proxy for World Of Tanks Blitz
