@@ -4,17 +4,16 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/byvko-dev/am-types/wargaming/generic/api"
-	"github.com/byvko-dev/am-types/wargaming/v1/clans"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
 type ClanSearchResponse struct {
-	api.Response
-	Data []clans.BasicProfile `json:"data"`
+	types.WgResponse
+	Data []types.Clan `json:"data"`
 }
 
-func SearchClans(realm, search string) ([]clans.BasicProfile, error) {
+func SearchClans(realm, search string) ([]types.Clan, error) {
 	var response ClanSearchResponse
 	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/list/?search=%v&limit=3", search), "GET", nil, &response)
 	if err != nil {

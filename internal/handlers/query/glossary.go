@@ -1,13 +1,13 @@
 package query
 
 import (
-	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/glossary"
+	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
 )
 
 func VehicleGlossaryHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	vid := c.Params("id")
 	realm := c.Params("realm")
@@ -29,7 +29,7 @@ func VehicleGlossaryHandler(c *fiber.Ctx) error {
 }
 
 func AllVehiclesGlossaryHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	realm := c.Params("realm")
 	lang := c.Params("language", "en")

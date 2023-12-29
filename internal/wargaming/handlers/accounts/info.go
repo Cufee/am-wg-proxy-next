@@ -5,20 +5,19 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/byvko-dev/am-types/wargaming/generic/api"
-	"github.com/byvko-dev/am-types/wargaming/v1/accounts"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
 type InfoResponse struct {
-	api.Response
-	Data map[string]accounts.CompleteProfile `json:"data"`
+	types.WgResponse
+	Data map[string]types.ExtendedAccount `json:"data"`
 }
 
-func GetAccountInfo(realm string, id string) (accounts.CompleteProfile, error) {
+func GetAccountInfo(realm string, id string) (types.ExtendedAccount, error) {
 	accountsMap, err := GetBulkAccountsInfo(realm, id)
 	if err != nil {
-		return accounts.CompleteProfile{}, err
+		return types.ExtendedAccount{}, err
 	}
 
 	info, ok := accountsMap[id]
@@ -28,7 +27,7 @@ func GetAccountInfo(realm string, id string) (accounts.CompleteProfile, error) {
 	return info, nil
 }
 
-func GetBulkAccountsInfo(realm string, ids ...string) (map[string]accounts.CompleteProfile, error) {
+func GetBulkAccountsInfo(realm string, ids ...string) (map[string]types.ExtendedAccount, error) {
 	var response InfoResponse
 	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/info/?account_id=%s&extra=statistics.rating", strings.Join(ids, ",")), "GET", nil, &response)
 	if err != nil {

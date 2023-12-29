@@ -1,14 +1,14 @@
 package query
 
 import (
-	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/accounts"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/clans"
+	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
 )
 
 func BulkAccountsInfoHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	pids := c.Query("ids")
 	realm := c.Params("realm")
@@ -29,7 +29,7 @@ func BulkAccountsInfoHandler(c *fiber.Ctx) error {
 }
 
 func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	pids := c.Query("ids")
 	realm := c.Params("realm")
@@ -50,7 +50,7 @@ func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
 }
 
 func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	cids := c.Query("ids")
 	realm := c.Params("realm")
@@ -71,7 +71,7 @@ func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
 }
 
 func BulkClanInfoHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	cids := c.Query("ids")
 	realm := c.Params("realm")

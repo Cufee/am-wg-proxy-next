@@ -5,20 +5,19 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/byvko-dev/am-types/wargaming/generic/api"
-	"github.com/byvko-dev/am-types/wargaming/v1/clans"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
 type AccountClanInfoResponse struct {
-	api.Response
-	Data map[string]clans.MemberProfile `json:"data"`
+	types.WgResponse
+	Data map[string]types.ClanMember `json:"data"`
 }
 
-func GetAccountClanInfo(realm string, playerId string) (clans.MemberProfile, error) {
+func GetAccountClanInfo(realm string, playerId string) (types.ClanMember, error) {
 	data, err := GetBulkAccountClanInfo(realm, playerId)
 	if err != nil {
-		return clans.MemberProfile{}, err
+		return types.ClanMember{}, err
 	}
 
 	info, ok := data[fmt.Sprint(playerId)]
@@ -28,7 +27,7 @@ func GetAccountClanInfo(realm string, playerId string) (clans.MemberProfile, err
 	return info, nil
 }
 
-func GetBulkAccountClanInfo(realm string, ids ...string) (map[string]clans.MemberProfile, error) {
+func GetBulkAccountClanInfo(realm string, ids ...string) (map[string]types.ClanMember, error) {
 	var response AccountClanInfoResponse
 	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/accountinfo/?account_id=%v&extra=clan", strings.Join(ids, ",")), "GET", nil, &response)
 	if err != nil {

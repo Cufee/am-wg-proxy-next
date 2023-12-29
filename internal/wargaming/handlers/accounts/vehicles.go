@@ -4,22 +4,21 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/byvko-dev/am-types/wargaming/generic/api"
-	"github.com/byvko-dev/am-types/wargaming/v1/statistics"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
 type VehiclesResponse struct {
-	api.Response
-	Data map[string][]statistics.VehicleStatsFrame `json:"data"`
+	types.WgResponse
+	Data map[string][]types.VehicleStatsFrame `json:"data"`
 }
 
 type VehicleAchievementsResponse struct {
-	api.Response
-	Data map[string]statistics.AchievementsFrame `json:"data"`
+	types.WgResponse
+	Data map[string]types.AchievementsFrame `json:"data"`
 }
 
-func GetAccountVehicles(realm string, id string) ([]statistics.VehicleStatsFrame, error) {
+func GetAccountVehicles(realm string, id string) ([]types.VehicleStatsFrame, error) {
 	var response VehiclesResponse
 	_, err := client.WargamingRequest(realm, fmt.Sprintf("tanks/stats/?account_id=%s", id), "GET", nil, &response)
 	if err != nil {

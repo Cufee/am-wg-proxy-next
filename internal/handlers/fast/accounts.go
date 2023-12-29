@@ -3,13 +3,13 @@ package fast
 import (
 	"strconv"
 
-	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/cufee/am-wg-proxy-next/helpers"
+	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
 )
 
 func AccountRealmByIDHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 	idStr := c.Params("id")
 	id, _ := strconv.Atoi(idStr)
 	if id == 0 {

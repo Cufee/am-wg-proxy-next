@@ -1,26 +1,27 @@
 package client
 
 import (
-	e "github.com/byvko-dev/am-types/errors/v2"
-	"github.com/byvko-dev/am-types/wargaming/v2/clans"
+	"errors"
+
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
-func (c *Client) GetClanByID(realm string, id int) (clans.CompleteProfile, *e.Error) {
-	var target clans.CompleteProfile
+func (c *Client) GetClanByID(realm string, id int) (types.ExtendedClan, error) {
+	var target types.ExtendedClan
 	return target, c.sendRequest(realm, clansGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
-func (c *Client) SearchClans(realm, query string) (clans.BasicProfile, *e.Error) {
+func (c *Client) SearchClans(realm, query string) (types.Clan, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 
-	var target []clans.BasicProfile
+	var target []types.Clan
 	err := c.sendRequest(realm, clansSearchEndpoint, &target, opts)
 	if err != nil {
-		return clans.BasicProfile{}, err
+		return types.Clan{}, err
 	}
 	if len(target) == 0 {
-		return clans.BasicProfile{}, e.Input(nil, "No results found")
+		return types.Clan{}, errors.New("no results found")
 	}
 	return target[0], nil
 }

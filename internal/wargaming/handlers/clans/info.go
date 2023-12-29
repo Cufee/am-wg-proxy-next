@@ -4,20 +4,19 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/byvko-dev/am-types/wargaming/generic/api"
-	"github.com/byvko-dev/am-types/wargaming/v1/clans"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
 type ClanInfoResponse struct {
-	api.Response
-	Data map[string]clans.CompleteProfile `json:"data"`
+	types.WgResponse
+	Data map[string]types.ExtendedClan `json:"data"`
 }
 
-func GetClanInfo(realm string, clanId string) (clans.CompleteProfile, error) {
+func GetClanInfo(realm string, clanId string) (types.ExtendedClan, error) {
 	data, err := GetBulkClanInfo(realm, clanId)
 	if err != nil {
-		return clans.CompleteProfile{}, err
+		return types.ExtendedClan{}, err
 	}
 
 	info, ok := data[clanId]
@@ -27,7 +26,7 @@ func GetClanInfo(realm string, clanId string) (clans.CompleteProfile, error) {
 	return info, nil
 }
 
-func GetBulkClanInfo(realm string, ids ...string) (map[string]clans.CompleteProfile, error) {
+func GetBulkClanInfo(realm string, ids ...string) (map[string]types.ExtendedClan, error) {
 	var response ClanInfoResponse
 	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/info/?clan_id=%v", ids), "GET", nil, &response)
 	if err != nil {

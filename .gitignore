@@ -1,7 +1,11 @@
-.env
-tmp
+# Configuration files
 .vscode
-vendor
 
-heap
-profile*
+# Environment variables
+.env
+
+# Air
+tmp
+
+# Local modules
+vendor

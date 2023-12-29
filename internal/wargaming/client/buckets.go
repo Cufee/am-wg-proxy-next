@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/byvko-dev/am-core/helpers/env"
+	"github.com/cufee/am-wg-proxy-next/internal/utils"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -24,10 +24,10 @@ var lastBucketIndex int32
 
 func init() {
 	// Setup fast buckets
-	proxyHostList := strings.Split(env.MustGetString("PROXY_HOST_LIST"), ",")
-	pass := env.MustGetString("PROXY_PASSWORD")
-	user := env.MustGetString("PROXY_USERNAME")
-	wgAppID := env.MustGetString("PROXY_WG_APP_ID")
+	proxyHostList := strings.Split(utils.MustGetEnv("PROXY_HOST_LIST"), ",")
+	pass := utils.MustGetEnv("PROXY_PASSWORD")
+	user := utils.MustGetEnv("PROXY_USERNAME")
+	wgAppID := utils.MustGetEnv("PROXY_WG_APP_ID")
 	for _, host := range proxyHostList {
 		port := strings.Split(host, ":")[1]
 		host = strings.Split(host, ":")[0]
@@ -41,7 +41,7 @@ func init() {
 		})
 	}
 
-	maxRps := env.MustGetString("PROXY_HOST_MAX_RPS")
+	maxRps := utils.MustGetEnv("PROXY_HOST_MAX_RPS")
 	rpsPerHost, err := strconv.Atoi(maxRps)
 	if err != nil {
 		panic("PROXY_HOST_MAX_RPS is not a number")

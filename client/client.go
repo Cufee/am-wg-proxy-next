@@ -10,9 +10,8 @@ import (
 	"strings"
 	"time"
 
-	api "github.com/byvko-dev/am-types/api/generic/v1"
-	e "github.com/byvko-dev/am-types/errors/v2"
 	"github.com/cufee/am-wg-proxy-next/internal/logs"
+	"github.com/cufee/am-wg-proxy-next/types"
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -81,7 +80,7 @@ const (
 	bulkAccountAchievementsEndpoint endpoint = "/bulk/accounts/achievements"
 )
 
-func (c *Client) sendRequest(realm string, path endpoint, target interface{}, optsInput ...requestOptions) *e.Error {
+func (c *Client) sendRequest(realm string, path endpoint, target interface{}, optsInput ...requestOptions) error {
 	opts := newDefaultRequestOptions()
 	if len(optsInput) > 0 {
 		opts = optsInput[0]
@@ -90,7 +89,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	// Build URL
 	urlData, err := url.Parse(fmt.Sprintf("http://%s/query/%s%s", c.host, strings.ToUpper(realm), path))
 	if err != nil {
-		return e.Internal(err, "Failed to parse final request URL")
+		return errors.New("failed to parse URL")
 	}
 	urlData.RawQuery = opts.Query.Encode()
 
@@ -102,11 +101,11 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	resp, err := c.httpClient.Get(urlData.String())
 	// Error checks
 	if resp == nil {
-		return e.Internal(errors.New("response is nil"), "Failed to send request")
+		return errors.New("client.Do returned nil response")
 	}
 	defer resp.Body.Close()
 	if err != nil {
-		return e.Internal(err, "Failed to send request")
+		return errors.Join(err, errors.New("client.Do failed"))
 	}
 
 	if c.debug {
@@ -115,7 +114,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return e.Internal(err, "Failed to read response body")
+		return errors.Join(err, errors.New("ioutil.ReadAll failed"))
 	}
 
 	// Header and status checks
@@ -123,31 +122,34 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 		if c.debug {
 			logs.Debug("Response is not JSON. Response body: %s", string(body))
 		}
-		return e.Internal(errors.New("response is not JSON"), string(body))
+		return errors.New("response is not JSON")
 	}
 	if resp.StatusCode != http.StatusOK {
-		return e.Internal(errors.New(resp.Status), string(body))
+		return errors.New("response status is not 200")
 	}
 
 	// Decode response
-	var responseDecoded api.ResponseWithError
+	var responseDecoded struct {
+		types.WgResponse
+		Data interface{} `json:"data"`
+	}
 	err = json.Unmarshal(body, &responseDecoded)
 	if err != nil {
-		return e.Internal(err, "Failed to unmarshal response")
+		return errors.Join(err, errors.New("failed to decode response"))
 	}
-	if responseDecoded.Error.Context != "" || responseDecoded.Error.Message != "" {
-		return e.Input(errors.New(responseDecoded.Error.Context), responseDecoded.Error.Message)
+	if responseDecoded.Error.Message != "" {
+		return errors.New(responseDecoded.Error.Message)
 	}
 
 	// Decode response data to target
 	// there is probably a cleaner way to unmarshal a generic interface
 	responseData, err := json.Marshal(responseDecoded.Data)
 	if err != nil {
-		return e.Internal(err, "Failed to parse response data")
+		return errors.Join(err, errors.New("failed to marshal response data"))
 	}
 	err = json.Unmarshal(responseData, target)
 	if err != nil {
-		return e.Internal(err, "Failed to decode response")
+		return errors.Join(err, errors.New("failed to unmarshal response data"))
 	}
 	return nil
 }

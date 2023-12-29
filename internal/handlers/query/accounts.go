@@ -1,13 +1,13 @@
 package query
 
 import (
-	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/accounts"
+	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
 )
 
 func SearchAccountsHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 	query := c.Query("query", c.Query("q", ""))
 	realm := c.Params("realm")
 	if query == "" || realm == "" {
@@ -27,7 +27,7 @@ func SearchAccountsHandler(c *fiber.Ctx) error {
 }
 
 func AccountInfoHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")
@@ -48,7 +48,7 @@ func AccountInfoHandler(c *fiber.Ctx) error {
 }
 
 func AccountAchievementsHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")
@@ -69,7 +69,7 @@ func AccountAchievementsHandler(c *fiber.Ctx) error {
 }
 
 func AccountVehiclesHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")

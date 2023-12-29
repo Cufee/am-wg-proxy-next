@@ -3,15 +3,12 @@ package client
 import (
 	"strings"
 
-	e "github.com/byvko-dev/am-types/errors/v2"
-	"github.com/byvko-dev/am-types/wargaming/v2/accounts"
-	"github.com/byvko-dev/am-types/wargaming/v2/clans"
-	"github.com/byvko-dev/am-types/wargaming/v2/statistics"
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
 // bulk.Get("/clans/info", query.BulkAccountsInfoHandler)
-func (c *Client) BulkGetClansByID(ids []string, realm string) (map[string]clans.CompleteProfile, *e.Error) {
-	var target map[string]clans.CompleteProfile
+func (c *Client) BulkGetClansByID(ids []string, realm string) (map[string]types.ExtendedClan, error) {
+	var target map[string]types.ExtendedClan
 
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("ids", strings.Join(ids, ","))
@@ -20,8 +17,8 @@ func (c *Client) BulkGetClansByID(ids []string, realm string) (map[string]clans.
 }
 
 // bulk.Get("/accounts/info", query.BulkAccountsInfoHandler)
-func (c *Client) BulkGetAccountsByID(ids []string, realm string) (map[string]accounts.CompleteProfile, *e.Error) {
-	var target map[string]accounts.CompleteProfile
+func (c *Client) BulkGetAccountsByID(ids []string, realm string) (map[string]types.ExtendedAccount, error) {
+	var target map[string]types.ExtendedAccount
 
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("ids", strings.Join(ids, ","))
@@ -30,8 +27,8 @@ func (c *Client) BulkGetAccountsByID(ids []string, realm string) (map[string]acc
 }
 
 // bulk.Get("/accounts/achievements", query.BulkAccountsAchievementsHandler)
-func (c *Client) BulkGetAccountsAchievements(ids []string, realm string) (map[string]statistics.AchievementsFrame, *e.Error) {
-	var target map[string]statistics.AchievementsFrame
+func (c *Client) BulkGetAccountsAchievements(ids []string, realm string) (map[string]types.AchievementsFrame, error) {
+	var target map[string]types.AchievementsFrame
 
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("ids", strings.Join(ids, ","))
@@ -40,8 +37,8 @@ func (c *Client) BulkGetAccountsAchievements(ids []string, realm string) (map[st
 }
 
 // bulk.Get("/accounts/clan", query.BulkAccountClanInfoHandler)
-func (c *Client) BulkGetAccountsClans(ids []string, realm string) (map[string]clans.MemberProfile, *e.Error) {
-	var target map[string]clans.MemberProfile
+func (c *Client) BulkGetAccountsClans(ids []string, realm string) (map[string]types.ClanMember, error) {
+	var target map[string]types.ClanMember
 
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("ids", strings.Join(ids, ","))

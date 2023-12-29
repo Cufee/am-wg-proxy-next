@@ -1,13 +1,13 @@
 package query
 
 import (
-	api "github.com/byvko-dev/am-types/api/generic/v1"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/clans"
+	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
 )
 
 func AccountClanInfoHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")
@@ -28,7 +28,7 @@ func AccountClanInfoHandler(c *fiber.Ctx) error {
 }
 
 func SearchClansHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	query := c.Query("query")
 	realm := c.Params("realm")
@@ -49,7 +49,7 @@ func SearchClansHandler(c *fiber.Ctx) error {
 }
 
 func ClanInfoHandler(c *fiber.Ctx) error {
-	var response api.ResponseWithError
+	var response types.ResponseWithError
 
 	cid := c.Params("cid")
 	realm := c.Params("realm")

@@ -1,16 +1,9 @@
 package helpers
 
 import (
-	"strings"
-
-	"github.com/byvko-dev/am-types/wargaming/v2/glossary"
+	"github.com/cufee/am-wg-proxy-next/types"
 )
 
 func GetLanguageCode(lang string) string {
-	for _, code := range glossary.AllLanguages {
-		if code == strings.ToLower(lang) {
-			return lang
-		}
-	}
-	return glossary.LangEN
+	return types.GetLocale(lang)
 }

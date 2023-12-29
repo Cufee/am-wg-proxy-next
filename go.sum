@@ -1,9 +1,5 @@
 github.com/andybalholm/brotli v1.0.4 h1:V7DdXeJtZscaqfNuAdSRuRFzuiKlHSC/Zh3zl9qY3JY=
 github.com/andybalholm/brotli v1.0.4/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
-github.com/byvko-dev/am-core v1.2.9 h1:GKT06xPOuqpcYC9GBy+A0gmYdrccnWJ4aC5M+IUjnfs=
-github.com/byvko-dev/am-core v1.2.9/go.mod h1:y18p/sMIn1XkeMSowe5Fv/T8faQl6RJGX+itNdI8gbQ=
-github.com/byvko-dev/am-types v1.6.5 h1:kYPj0XALBBsHsklPpjKDbMnORTxZpOo2dzo8u3rmKu0=
-github.com/byvko-dev/am-types v1.6.5/go.mod h1:TCoD1hASh/YP+AT+Ueul35R20LWTpH1dGofrZNG/mK0=
 github.com/gofiber/fiber/v2 v2.36.0 h1:1qLMe5rhXFLPa2SjK10Wz7WFgLwYi4TYg7XrjztJHqA=
 github.com/gofiber/fiber/v2 v2.36.0/go.mod h1:tgCr+lierLwLoVHHO/jn3Niannv34WRkQETU8wiL9fQ=
 github.com/joho/godotenv v1.4.0 h1:3l4+N6zfMWnkbPEXKng2o2/MR5mSwTrBih4ZEkkz1lg=
