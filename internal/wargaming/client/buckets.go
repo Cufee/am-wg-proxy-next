@@ -65,11 +65,18 @@ func init() {
 		wgAppId:        fallbackWgAppId,
 		ticker:         time.NewTicker(time.Second / time.Duration(fallbackRps)),
 		activeRequests: fallbackRps * 100, // Make sure this bucket is never picked
+		proxyUrl:       nil,
 	}
 	proxyBuckets["*"] = append(proxyBuckets["*"], fallbackBucket)
 
+	proxyHostList := os.Getenv("PROXY_HOST_LIST")
+	if proxyHostList == "" {
+		logs.Warning("No proxy buckets configured")
+		return
+	}
+
 	// Parse proxy settings
-	for _, proxyString := range strings.Split(os.Getenv("PROXY_HOST_LIST"), ",") {
+	for _, proxyString := range strings.Split(proxyHostList, ",") {
 		bucketSettings, err := parseProxySettings(proxyString, fallbackWgAppId, fallbackRps)
 		if err != nil {
 			panic(err)

@@ -13,6 +13,8 @@ import (
 	"github.com/cufee/am-wg-proxy-next/internal/logs"
 )
 
+var ErrNoProxyBuckets = errors.New("no proxy buckets configured")
+
 func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (*proxyBucket, error) {
 	var bucketSettings proxyBucket
 
@@ -78,6 +80,9 @@ func pickBucket(realm string) (*proxyBucket, error) {
 		if !ok {
 			return nil, errors.New("no proxy buckets configured")
 		}
+	}
+	if len(buckets) == 0 {
+		return nil, ErrNoProxyBuckets
 	}
 
 	if len(buckets) == 1 {
