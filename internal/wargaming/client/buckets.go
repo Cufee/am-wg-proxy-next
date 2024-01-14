@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	"github.com/cufee/am-wg-proxy-next/internal/utils"
@@ -25,7 +24,7 @@ type proxyBucket struct {
 	wgAppId string
 
 	mu             sync.Mutex
-	ticker         *time.Ticker
+	limiter        chan int
 	activeRequests int
 
 	proxyUrl   *url.URL
@@ -38,10 +37,12 @@ func (b *proxyBucket) waitForTick() {
 	b.mu.Lock()
 	b.activeRequests++
 	b.mu.Unlock()
-	<-b.ticker.C
+	b.limiter <- 1
 }
 
 func (b *proxyBucket) onComplete() {
+	<-b.limiter
+
 	b.mu.Lock()
 	b.activeRequests--
 	b.mu.Unlock()
@@ -59,11 +60,12 @@ func init() {
 		panic("FALLBACK_MAX_RPS is not a number")
 	}
 
+	fallbackLimiter := make(chan int, fallbackRps)
 	fallbackBucket := &proxyBucket{
 		mu:             sync.Mutex{},
 		rps:            fallbackRps,
 		wgAppId:        fallbackWgAppId,
-		ticker:         time.NewTicker(time.Second / time.Duration(fallbackRps)),
+		limiter:        fallbackLimiter,
 		activeRequests: fallbackRps * 100, // Make sure this bucket is never picked
 		proxyUrl:       nil,
 	}

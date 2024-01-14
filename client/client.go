@@ -87,7 +87,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	}
 
 	// Build URL
-	urlData, err := url.Parse(fmt.Sprintf("http://%s/query/%s%s", c.host, strings.ToUpper(realm), path))
+	urlData, err := url.Parse(fmt.Sprintf("%s/query/%s%s", c.host, strings.ToUpper(realm), path))
 	if err != nil {
 		return errors.New("failed to parse URL")
 	}

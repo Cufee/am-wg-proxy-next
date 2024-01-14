@@ -8,7 +8,7 @@ import (
 )
 
 func AccountRealmByIDHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[string]
 	idStr := c.Params("id")
 	id, _ := strconv.Atoi(idStr)
 	if id == 0 {

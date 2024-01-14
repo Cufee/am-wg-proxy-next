@@ -14,17 +14,17 @@ type InfoResponse struct {
 	Data map[string]types.ExtendedAccount `json:"data"`
 }
 
-func GetAccountInfo(realm string, id string) (types.ExtendedAccount, error) {
+func GetAccountInfo(realm string, id string) (*types.ExtendedAccount, error) {
 	accountsMap, err := GetBulkAccountsInfo(realm, id)
 	if err != nil {
-		return types.ExtendedAccount{}, err
+		return nil, err
 	}
 
 	info, ok := accountsMap[id]
-	if !ok {
-		return info, errors.New("account not found")
+	if !ok || info.ID == 0 {
+		return nil, errors.New("account not found")
 	}
-	return info, nil
+	return &info, nil
 }
 
 func GetBulkAccountsInfo(realm string, ids ...string) (map[string]types.ExtendedAccount, error) {

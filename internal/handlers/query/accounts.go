@@ -7,7 +7,7 @@ import (
 )
 
 func SearchAccountsHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[[]types.Account]
 	query := c.Query("query", c.Query("q", ""))
 	realm := c.Params("realm")
 	if query == "" || realm == "" {
@@ -27,7 +27,7 @@ func SearchAccountsHandler(c *fiber.Ctx) error {
 }
 
 func AccountInfoHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[*types.ExtendedAccount]
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")
@@ -48,7 +48,7 @@ func AccountInfoHandler(c *fiber.Ctx) error {
 }
 
 func AccountAchievementsHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[*types.AchievementsFrame]
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")
@@ -69,7 +69,7 @@ func AccountAchievementsHandler(c *fiber.Ctx) error {
 }
 
 func AccountVehiclesHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[[]types.VehicleStatsFrame]
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")

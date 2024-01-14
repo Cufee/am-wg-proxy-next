@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/cufee/am-wg-proxy-next/internal/logs"
 )
@@ -46,7 +45,7 @@ func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (
 	}
 
 	bucketSettings.mu = sync.Mutex{}
-	bucketSettings.ticker = time.NewTicker(time.Second / time.Duration(bucketSettings.rps))
+	bucketSettings.limiter = make(chan int, bucketSettings.rps)
 
 	bucketSettings.proxyUrl = buildProxyURL(bucketSettings.host, bucketSettings.port, bucketSettings.username, bucketSettings.password)
 	bucketSettings.authHeader = "Basic " + base64.StdEncoding.EncodeToString([]byte(bucketSettings.username+":"+bucketSettings.password))

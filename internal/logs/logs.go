@@ -4,32 +4,53 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
+
+var allEnvs []string
+
+func init() {
+	var env = os.Environ()
+	for _, e := range env {
+		split := strings.Split(e, "=")
+		if len(split) != 2 {
+			continue
+		}
+		allEnvs = append(allEnvs, split[1])
+	}
+}
+
+func maskEnv(s string) string {
+	for _, e := range allEnvs {
+		s = strings.ReplaceAll(s, e, "***")
+	}
+	return s
+}
 
 func Debug(format string, args ...interface{}) {
 	if os.Getenv("DEBUG") == "true" {
-		log.Printf("DEBUG: "+format, args...)
+		log.Println(maskEnv(fmt.Sprintf("DEBUG: "+format, args...)))
 	}
 }
 
 func Info(format string, args ...interface{}) {
-	log.Printf("INFO: "+format, args...)
+	log.Println(maskEnv(fmt.Sprintf("INFO: "+format, args...)))
 }
 
 func Warning(format string, args ...interface{}) {
-	log.Printf("WARNING: "+format, args...)
+	log.Println(maskEnv(fmt.Sprintf("WARNING: "+format, args...)))
 }
 
 func Error(format string, args ...interface{}) {
-	log.Printf("ERROR: "+format, args...)
+	log.Println(maskEnv(fmt.Sprintf("ERROR: "+format, args...)))
 }
 
 func Critical(format string, args ...interface{}) {
-	log.Printf("CRITICAL: "+format, args...)
+	log.Println(maskEnv(fmt.Sprintf("CRITICAL: "+format, args...)))
 }
 
 func Fatal(format string, args ...interface{}) {
-	log.Fatalf("FATAL: "+format, args...)
+	log.Fatal(maskEnv(fmt.Sprintf("FATAL: "+format, args...)))
 }
 
 func Wrap(err error, format string, args ...interface{}) error {

@@ -101,7 +101,7 @@ func (a *AchievementsFrame) Subtract(b *AchievementsFrame) {
 Account vehicle stats schema for WG API
 */
 type VehicleStatsFrame struct {
-	Stats          StatsFrame `bson:",inline"`
+	Stats          StatsFrame `json:"all" bson:",inline"`
 	LastBattleTime int        `json:"last_battle_time" bson:"last_battle_time"`
 	MarkOfMastery  int        `json:"mark_of_mastery"  bson:"mark_of_mastery"`
 	TankID         int        `json:"tank_id" bson:"tank_id"`

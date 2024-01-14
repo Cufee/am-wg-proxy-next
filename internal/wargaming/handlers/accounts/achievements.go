@@ -16,17 +16,17 @@ type AchievementsResponse struct {
 	} `json:"data"`
 }
 
-func GetAccountAchievements(realm string, id string) (types.AchievementsFrame, error) {
+func GetAccountAchievements(realm string, id string) (*types.AchievementsFrame, error) {
 	achievementsMap, err := GetBulkAccountsAchievements(realm, id)
 	if err != nil {
-		return types.AchievementsFrame{}, errors.Wrap(err, "GetAccountAchievements > GetBulkAccountsAchievements")
+		return nil, errors.Wrap(err, "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
 
 	info, ok := achievementsMap[id]
 	if !ok {
-		return info, errors.Wrap(errors.New("account not found"), "GetAccountAchievements > GetBulkAccountsAchievements")
+		return nil, errors.Wrap(errors.New("account not found"), "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
-	return info, nil
+	return &info, nil
 }
 
 func GetBulkAccountsAchievements(realm string, ids ...string) (map[string]types.AchievementsFrame, error) {

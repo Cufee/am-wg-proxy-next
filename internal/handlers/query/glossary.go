@@ -7,7 +7,7 @@ import (
 )
 
 func VehicleGlossaryHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[*types.VehicleDetails]
 
 	vid := c.Params("id")
 	realm := c.Params("realm")
@@ -29,7 +29,7 @@ func VehicleGlossaryHandler(c *fiber.Ctx) error {
 }
 
 func AllVehiclesGlossaryHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[map[string]types.VehicleDetails]
 
 	realm := c.Params("realm")
 	lang := c.Params("language", "en")

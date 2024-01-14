@@ -7,7 +7,7 @@ import (
 )
 
 func AccountClanInfoHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[*types.ClanMember]
 
 	pid := c.Params("pid")
 	realm := c.Params("realm")
@@ -28,7 +28,7 @@ func AccountClanInfoHandler(c *fiber.Ctx) error {
 }
 
 func SearchClansHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[[]types.Clan]
 
 	query := c.Query("query")
 	realm := c.Params("realm")
@@ -49,7 +49,7 @@ func SearchClansHandler(c *fiber.Ctx) error {
 }
 
 func ClanInfoHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[*types.ExtendedClan]
 
 	cid := c.Params("cid")
 	realm := c.Params("realm")

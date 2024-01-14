@@ -8,7 +8,7 @@ import (
 )
 
 func BulkAccountsInfoHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[map[string]types.ExtendedAccount]
 
 	pids := c.Query("ids")
 	realm := c.Params("realm")
@@ -29,7 +29,7 @@ func BulkAccountsInfoHandler(c *fiber.Ctx) error {
 }
 
 func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[map[string]types.AchievementsFrame]
 
 	pids := c.Query("ids")
 	realm := c.Params("realm")
@@ -50,7 +50,7 @@ func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
 }
 
 func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[map[string]types.ClanMember]
 
 	cids := c.Query("ids")
 	realm := c.Params("realm")
@@ -71,7 +71,7 @@ func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
 }
 
 func BulkClanInfoHandler(c *fiber.Ctx) error {
-	var response types.ResponseWithError
+	var response types.ResponseWithError[map[string]types.ExtendedClan]
 
 	cids := c.Query("ids")
 	realm := c.Params("realm")

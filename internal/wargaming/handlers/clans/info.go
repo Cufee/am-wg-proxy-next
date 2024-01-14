@@ -13,17 +13,17 @@ type ClanInfoResponse struct {
 	Data map[string]types.ExtendedClan `json:"data"`
 }
 
-func GetClanInfo(realm string, clanId string) (types.ExtendedClan, error) {
+func GetClanInfo(realm string, clanId string) (*types.ExtendedClan, error) {
 	data, err := GetBulkClanInfo(realm, clanId)
 	if err != nil {
-		return types.ExtendedClan{}, err
+		return nil, err
 	}
 
 	info, ok := data[clanId]
-	if !ok {
-		return info, errors.New("account not found")
+	if !ok || info.ID == 0 {
+		return nil, errors.New("clan not found")
 	}
-	return info, nil
+	return &info, nil
 }
 
 func GetBulkClanInfo(realm string, ids ...string) (map[string]types.ExtendedClan, error) {
