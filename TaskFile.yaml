@@ -29,8 +29,8 @@ tasks:
   build:docker:
     desc: Build the application for Docker
     cmds:
-      - go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o {{ .CLI_ARGS | default "app" }} .
+      - go build -o {{ .CLI_ARGS | default "app" }} .
   build:image:
     desc: Build the Docker image
     cmds:
-      - docker build --progress=plain --platform linux/amd64 -t {{ .CLI_ARGS | default "github.com/cufee/aftermath-core" }} .
+      - docker build --progress=plain --platform linux/amd64 -t {{ .CLI_ARGS | default "github.com/cufee/am-wg-proxy-next" }} .

@@ -1,4 +1,4 @@
-FROM golang:1.21 as build
+FROM --platform=linux/amd64 golang:1.21 as build
 
 WORKDIR /workspace
 COPY . ./
@@ -9,10 +9,9 @@ RUN go mod download
 # install task
 RUN go install github.com/go-task/task/v3/cmd/task@latest
 
-# generate the Prisma Client Go client
 RUN task build:docker
 
-FROM scratch as run
+FROM --platform=linux/amd64 scratch as run
 
 ENV TZ=Europe/Berlin
 ENV ZONEINFO=/zoneinfo.zip
