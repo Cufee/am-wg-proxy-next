@@ -10,14 +10,14 @@ import (
 var allEnvs []string
 
 func init() {
-	var env = os.Environ()
-	for _, e := range env {
-		split := strings.Split(e, "=")
-		if len(split) != 2 {
-			continue
-		}
-		allEnvs = append(allEnvs, split[1])
-	}
+	// var env = os.Environ()
+	// for _, e := range env {
+	// 	split := strings.Split(e, "=")
+	// 	if len(split) != 2 {
+	// 		continue
+	// 	}
+	// 	allEnvs = append(allEnvs, split[1])
+	// }
 }
 
 func maskEnv(s string) string {
