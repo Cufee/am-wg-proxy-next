@@ -20,6 +20,10 @@ func main() {
 
 	app.Use(logger.New())
 
+	app.Get("/ping", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusOK)
+	})
+
 	v1 := app.Group("/v1")
 
 	// Quick checks
