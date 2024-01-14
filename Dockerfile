@@ -1,31 +1,24 @@
-FROM golang:alpine as builder
+FROM golang:1.21 as build
 
-# SSH setup
-ARG SSH_PRIVATE_KEY
-RUN mkdir -p /root/.ssh
-RUN --mount=type=secret,id=ssh_priv,dst=/id_rsa cat /id_rsa > /root/.ssh/id_rsa
-RUN --mount=type=secret,id=ssh_pub,dst=/id_rsa.pub cat /id_rsa.pub > /root/.ssh/id_rsa.pub
-RUN chmod 600 /root/.ssh/id_rsa
+WORKDIR /workspace
+COPY . ./
 
-RUN apk add --update --no-cache openssh
-RUN ssh-keyscan -H github.com >> /root/.ssh/known_hosts
+# add go modules lockfiles
+RUN go mod download
 
-RUN apk add git
-# Override go get to use ssh instead of https
-RUN git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+# install task
+RUN go install github.com/go-task/task/v3/cmd/task@latest
 
-WORKDIR /app 
+# generate the Prisma Client Go client
+RUN task build:docker
 
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o binary .
-
-FROM scratch
+FROM scratch as run
 
 ENV TZ=Europe/Berlin
 ENV ZONEINFO=/zoneinfo.zip
-COPY --from=builder /app/binary /usr/bin/
-COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build /usr/local/go/lib/time/zoneinfo.zip /
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-ENTRYPOINT ["binary"]
+COPY --from=build /workspace/app .
+
+CMD ["./app"]
