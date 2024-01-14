@@ -99,12 +99,8 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 
 	// Send request
 	resp, err := c.httpClient.Get(urlData.String())
-	// Error checks
 	if err != nil {
 		return errors.Join(err, err)
-	}
-	if resp == nil {
-		return errors.New("client.Do returned nil response")
 	}
 	defer resp.Body.Close()
 
