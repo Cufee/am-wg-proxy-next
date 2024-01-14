@@ -100,13 +100,13 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	// Send request
 	resp, err := c.httpClient.Get(urlData.String())
 	// Error checks
+	if err != nil {
+		return errors.Join(err, err)
+	}
 	if resp == nil {
 		return errors.New("client.Do returned nil response")
 	}
 	defer resp.Body.Close()
-	if err != nil {
-		return errors.Join(err, errors.New("client.Do failed"))
-	}
 
 	if c.debug {
 		logs.Debug("Got response with status %s", resp.Status)
