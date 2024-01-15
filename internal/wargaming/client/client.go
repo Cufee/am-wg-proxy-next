@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/client"
-	"github.com/cufee/am-wg-proxy-next/internal/logs"
+	"github.com/rs/zerolog/log"
+
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -33,7 +34,7 @@ func WargamingRequest(realm, path, method string, payload []byte, target interfa
 	query.Set("application_id", bkt.wgAppId)
 	endpoint.RawQuery = query.Encode()
 
-	logs.Debug("WargamingRequest: %v %v", method, endpoint.String())
+	log.Debug().Str("realm", realm).Str("endpoint", endpoint.String()).Msg("Sending request")
 
 	headers := make(map[string]string)
 	if bkt.proxyUrl != nil {

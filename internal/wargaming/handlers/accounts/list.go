@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
 	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/rs/zerolog/log"
 )
 
 type SearchResponse struct {
@@ -21,7 +21,7 @@ func SearchAccounts(realm, query string) ([]types.Account, error) {
 		return nil, err
 	}
 	if response.Error.Code != 0 {
-		logs.Error("Error while searching accounts: %+v", response.Error)
+		log.Error().Str("realm", realm).Str("query", query).Msg("Error while searching accounts")
 		return nil, errors.New(response.Error.Message)
 	}
 

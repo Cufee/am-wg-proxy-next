@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cufee/am-wg-proxy-next/internal/logs"
+	"github.com/rs/zerolog/log"
 )
 
 var ErrNoProxyBuckets = errors.New("no proxy buckets configured")
@@ -64,7 +64,7 @@ func buildProxyURL(host, port, username, password string) *url.URL {
 
 func pickBucket(realm string) (*proxyBucket, error) {
 	if len(proxyBuckets) == 0 {
-		logs.Warning("No proxy buckets configured")
+		log.Warn().Msg("No proxy buckets configured")
 		return nil, nil
 	}
 
@@ -74,7 +74,6 @@ func pickBucket(realm string) (*proxyBucket, error) {
 
 	buckets, ok := proxyBuckets[realm]
 	if !ok {
-		logs.Warning("No proxy buckets configured for realm %v, using fallback", realm)
 		buckets, ok = proxyBuckets["*"]
 		if !ok {
 			return nil, errors.New("no proxy buckets configured")

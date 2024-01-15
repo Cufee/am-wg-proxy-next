@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	"github.com/cufee/am-wg-proxy-next/internal/utils"
+	"github.com/rs/zerolog/log"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -32,7 +32,7 @@ type proxyBucket struct {
 }
 
 func (b *proxyBucket) waitForTick() {
-	logs.Debug("Waiting for tick in bucket %v", b.realm)
+	log.Debug().Str("realm", b.realm).Msg("Waiting for tick")
 
 	b.mu.Lock()
 	b.activeRequests++
@@ -47,7 +47,7 @@ func (b *proxyBucket) onComplete() {
 	b.activeRequests--
 	b.mu.Unlock()
 
-	logs.Debug("Completed request in bucket %v", b.realm)
+	log.Debug().Str("realm", b.realm).Msg("Completed request")
 }
 
 var proxyBuckets map[string][]*proxyBucket = make(map[string][]*proxyBucket)
@@ -73,7 +73,7 @@ func init() {
 
 	proxyHostList := os.Getenv("PROXY_HOST_LIST")
 	if proxyHostList == "" {
-		logs.Warning("No proxy buckets configured")
+		log.Warn().Msg("PROXY_HOST_LIST is empty, using fallback bucket")
 		return
 	}
 

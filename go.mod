@@ -7,7 +7,11 @@ require (
 	github.com/joho/godotenv v1.5.1
 )
 
-require github.com/pkg/errors v0.9.1
+require (
+	github.com/gofiber/contrib/fiberzerolog v0.2.3
+	github.com/pkg/errors v0.9.1
+	github.com/rs/zerolog v1.31.0
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.6 // indirect

@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cufee/am-wg-proxy-next/internal/logs"
 	"github.com/cufee/am-wg-proxy-next/types"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/rs/zerolog/log"
 )
 
 type Client struct {
@@ -94,7 +94,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	urlData.RawQuery = opts.Query.Encode()
 
 	if c.debug {
-		logs.Debug("Sending request to %s", urlData.String())
+
 	}
 
 	// Send request
@@ -105,7 +105,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	defer resp.Body.Close()
 
 	if c.debug {
-		logs.Debug("Got response with status %s", resp.Status)
+		log.Debug().Str("url", urlData.String()).Msgf("Got response with status %v", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -116,11 +116,12 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	// Header and status checks
 	if resp.Header.Get("Content-Type") != "application/json" {
 		if c.debug {
-			logs.Debug("Response is not JSON. Response body: %s", string(body))
+			log.Debug().Str("url", urlData.String()).Msgf("Response is not JSON. Response body: %s", string(body))
 		}
 		return errors.New("response is not JSON")
 	}
 	if resp.StatusCode != http.StatusOK {
+
 		return errors.New("response status is not 200")
 	}
 

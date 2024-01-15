@@ -1,26 +1,30 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/rs/zerolog"
 
 	"github.com/cufee/am-wg-proxy-next/internal/handlers/fast"
 	"github.com/cufee/am-wg-proxy-next/internal/handlers/query"
-	"github.com/cufee/am-wg-proxy-next/internal/logs"
+	"github.com/gofiber/contrib/fiberzerolog"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 
 	_ "net/http/pprof"
 )
 
 func main() {
+	level, _ := zerolog.ParseLevel(os.Getenv("LOG_LEVEL"))
+	zerolog.SetGlobalLevel(level)
+
 	// Setup a server
 	app := fiber.New(fiber.Config{
 		Network: os.Getenv("NETWORK"),
 	})
 
-	app.Use(logger.New())
+	app.Use(fiberzerolog.New())
 
 	app.Get("/ping", func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusOK)
@@ -63,7 +67,7 @@ func main() {
 	bulk.Get("/accounts/clan", query.BulkAccountClanInfoHandler)
 	bulk.Get("/accounts/achievements", query.BulkAccountsAchievementsHandler)
 
-	logs.Fatal("Failed to start a server: %v", app.Listen(":"+os.Getenv("PORT")))
+	log.Fatal(app.Listen(":" + os.Getenv("PORT")))
 }
 
 func dummyHandlerFunc(c *fiber.Ctx) error {
