@@ -3,6 +3,7 @@ package clans
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
 	"github.com/cufee/am-wg-proxy-next/types"
@@ -28,7 +29,7 @@ func GetClanInfo(realm string, clanId string) (*types.ExtendedClan, error) {
 
 func GetBulkClanInfo(realm string, ids ...string) (map[string]types.ExtendedClan, error) {
 	var response ClanInfoResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/info/?clan_id=%v", ids), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/info/?clan_id=%s", strings.Join(ids, ",")), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
