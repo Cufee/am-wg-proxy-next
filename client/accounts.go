@@ -23,25 +23,25 @@ func (c *Client) SearchAccounts(realm, query string) (types.Account, error) {
 
 func (c *Client) GetAccountByID(id int) (types.ExtendedAccount, error) {
 	var target types.ExtendedAccount
-	return target, c.sendRequest(realmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func (c *Client) GetAccountClan(id int) (types.ClanMember, error) {
 	var target types.ClanMember
-	return target, c.sendRequest(realmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func (c *Client) GetAccountVehicles(id int) ([]types.VehicleStatsFrame, error) {
 	var target []types.VehicleStatsFrame
-	return target, c.sendRequest(realmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
 func (c *Client) GetAccountAchievements(id int) (types.AchievementsFrame, error) {
 	var target types.AchievementsFrame
-	return target, c.sendRequest(realmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
 }
 
-func realmFromPlayerID(id int) string {
+func RealmFromPlayerID(id int) string {
 	switch {
 	case id == 0:
 		return ""
