@@ -22,7 +22,19 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	defer func() {
 		// Logging
 		if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
-			log.Warn().Str("url", url).Str("method", method).Str("proxy", proxy.String()).Str("payload", string(payload)).Str("response", string(bodyBytes)).Err(err).Msg("HttpRequest failed")
+			data := make(map[string]string)
+			data["url"] = url
+			data["method"] = method
+			if proxy != nil {
+				data["proxy"] = proxy.String()
+			}
+			if payload != nil {
+				data["payload"] = string(payload)
+			}
+			if resp != nil {
+				data["response"] = string(bodyBytes)
+			}
+			log.Warn().Any("data", data).Err(err).Msg("HttpRequest failed")
 		}
 	}()
 
@@ -55,7 +67,7 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	defer client.CloseIdleConnections()
 	resp, err = client.Do(req)
 	if err != nil {
-		log.Warn().Str("url", url).Str("method", method).Str("proxy", proxy.String()).Str("payload", string(payload)).Err(err).Msg("client.Do failed")
+		log.Warn().Str("url", url).Str("method", method).Str("payload", string(payload)).Err(err).Msg("client.Do failed")
 		return resp.StatusCode, err
 	}
 	defer resp.Body.Close()

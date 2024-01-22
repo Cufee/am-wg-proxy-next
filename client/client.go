@@ -60,6 +60,8 @@ func (e endpoint) Fmt(args ...interface{}) endpoint {
 }
 
 const (
+	openIDLoginEndpoint endpoint = "/auth/login"
+
 	accountsSearchEndpoint            endpoint = "/accounts/search"
 	accountsGetEndpointFMT            endpoint = "/accounts/%v"
 	accountClanGetEndpointFMT         endpoint = "/accounts/%v/clan"
@@ -92,10 +94,6 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 		return errors.New("failed to parse URL")
 	}
 	urlData.RawQuery = opts.Query.Encode()
-
-	if c.debug {
-
-	}
 
 	// Send request
 	resp, err := c.httpClient.Get(urlData.String())
