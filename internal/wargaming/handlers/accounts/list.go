@@ -3,6 +3,8 @@ package accounts
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
 	"github.com/cufee/am-wg-proxy-next/types"
@@ -14,14 +16,21 @@ type SearchResponse struct {
 	Data []types.Account `json:"data"`
 }
 
-func SearchAccounts(realm, query string) ([]types.Account, error) {
+func SearchAccounts(realm, search string, fields ...string) ([]types.Account, error) {
 	var response SearchResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/list/?search=%v&limit=3", query), "GET", nil, &response)
+	var query url.Values
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("search", search)
+	query.Set("limit", "3")
+
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/list/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
 	if response.Error.Code != 0 {
-		log.Error().Str("realm", realm).Str("query", query).Msg("Error while searching accounts")
+		log.Error().Str("realm", realm).Str("query", search).Msg("Error while searching accounts")
 		return nil, errors.New(response.Error.Message)
 	}
 

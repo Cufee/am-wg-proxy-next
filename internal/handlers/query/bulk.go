@@ -1,6 +1,8 @@
 package query
 
 import (
+	"strings"
+
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/accounts"
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/clans"
 	"github.com/cufee/am-wg-proxy-next/types"
@@ -17,7 +19,7 @@ func BulkAccountsInfoHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := accounts.GetBulkAccountsInfo(realm, pids)
+	result, err := accounts.GetBulkAccountsInfo(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -38,7 +40,7 @@ func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := accounts.GetBulkAccountsAchievements(realm, pids)
+	result, err := accounts.GetBulkAccountsAchievements(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -59,7 +61,7 @@ func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := clans.GetBulkAccountClanInfo(realm, cids)
+	result, err := clans.GetBulkAccountClanInfo(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -79,7 +81,7 @@ func BulkClanInfoHandler(c *fiber.Ctx) error {
 		response.Error.Message = "Clan id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
-	result, err := clans.GetBulkClanInfo(realm, cids)
+	result, err := clans.GetBulkClanInfo(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()

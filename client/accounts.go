@@ -2,13 +2,17 @@ package client
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/types"
 )
 
-func (c *Client) SearchAccounts(realm, query string) (types.Account, error) {
+func (c *Client) SearchAccounts(realm, query string, fields ...string) (types.Account, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
+	if len(fields) > 0 {
+		opts.Query.Add("fields", strings.Join(fields, ","))
+	}
 
 	var target []types.Account
 	err := c.sendRequest(realm, accountsSearchEndpoint, &target, opts)
@@ -21,24 +25,44 @@ func (c *Client) SearchAccounts(realm, query string) (types.Account, error) {
 	return target[0], nil
 }
 
-func (c *Client) GetAccountByID(id int) (types.ExtendedAccount, error) {
+func (c *Client) GetAccountByID(id int, fields ...string) (types.ExtendedAccount, error) {
+	opts := newDefaultRequestOptions()
+	if len(fields) > 0 {
+		opts.Query.Add("fields", strings.Join(fields, ","))
+	}
+
 	var target types.ExtendedAccount
-	return target, c.sendRequest(RealmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, opts)
 }
 
-func (c *Client) GetAccountClan(id int) (types.ClanMember, error) {
+func (c *Client) GetAccountClan(id int, fields ...string) (types.ClanMember, error) {
+	opts := newDefaultRequestOptions()
+	if len(fields) > 0 {
+		opts.Query.Add("fields", strings.Join(fields, ","))
+	}
+
 	var target types.ClanMember
-	return target, c.sendRequest(RealmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, opts)
 }
 
-func (c *Client) GetAccountVehicles(id int) ([]types.VehicleStatsFrame, error) {
+func (c *Client) GetAccountVehicles(id int, fields ...string) ([]types.VehicleStatsFrame, error) {
+	opts := newDefaultRequestOptions()
+	if len(fields) > 0 {
+		opts.Query.Add("fields", strings.Join(fields, ","))
+	}
+
 	var target []types.VehicleStatsFrame
-	return target, c.sendRequest(RealmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, opts)
 }
 
-func (c *Client) GetAccountAchievements(id int) (types.AchievementsFrame, error) {
+func (c *Client) GetAccountAchievements(id int, fields ...string) (types.AchievementsFrame, error) {
+	opts := newDefaultRequestOptions()
+	if len(fields) > 0 {
+		opts.Query.Add("fields", strings.Join(fields, ","))
+	}
+
 	var target types.AchievementsFrame
-	return target, c.sendRequest(RealmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, newDefaultRequestOptions())
+	return target, c.sendRequest(RealmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
 }
 
 func RealmFromPlayerID(id int) string {

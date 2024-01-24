@@ -3,6 +3,8 @@ package accounts
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
 	"github.com/cufee/am-wg-proxy-next/types"
@@ -18,9 +20,15 @@ type VehicleAchievementsResponse struct {
 	Data map[string]types.AchievementsFrame `json:"data"`
 }
 
-func GetAccountVehicles(realm string, id string) ([]types.VehicleStatsFrame, error) {
+func GetAccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
 	var response VehiclesResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("tanks/stats/?account_id=%s", id), "GET", nil, &response)
+	var query url.Values
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("account_id", id)
+
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("tanks/stats/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

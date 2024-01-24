@@ -60,8 +60,6 @@ func (e endpoint) Fmt(args ...interface{}) endpoint {
 }
 
 const (
-	openIDLoginEndpoint endpoint = "/auth/login"
-
 	accountsSearchEndpoint            endpoint = "/accounts/search"
 	accountsGetEndpointFMT            endpoint = "/accounts/%v"
 	accountClanGetEndpointFMT         endpoint = "/accounts/%v/clan"

@@ -1,6 +1,8 @@
 package query
 
 import (
+	"strings"
+
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/accounts"
 	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
@@ -15,7 +17,7 @@ func SearchAccountsHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := accounts.SearchAccounts(realm, query)
+	result, err := accounts.SearchAccounts(realm, query, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "player not found"
 		response.Error.Context = err.Error()
@@ -36,7 +38,7 @@ func AccountInfoHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := accounts.GetAccountInfo(realm, pid)
+	result, err := accounts.GetAccountInfo(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -57,7 +59,7 @@ func AccountAchievementsHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := accounts.GetAccountAchievements(realm, pid)
+	result, err := accounts.GetAccountAchievements(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -78,7 +80,7 @@ func AccountVehiclesHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := accounts.GetAccountVehicles(realm, pid)
+	result, err := accounts.GetAccountVehicles(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()

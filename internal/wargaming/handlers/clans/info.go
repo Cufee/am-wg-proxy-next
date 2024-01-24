@@ -3,6 +3,7 @@ package clans
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
@@ -14,8 +15,8 @@ type ClanInfoResponse struct {
 	Data map[string]types.ExtendedClan `json:"data"`
 }
 
-func GetClanInfo(realm string, clanId string) (*types.ExtendedClan, error) {
-	data, err := GetBulkClanInfo(realm, clanId)
+func GetClanInfo(realm string, clanId string, fields ...string) (*types.ExtendedClan, error) {
+	data, err := GetBulkClanInfo(realm, []string{clanId}, fields...)
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +28,15 @@ func GetClanInfo(realm string, clanId string) (*types.ExtendedClan, error) {
 	return &info, nil
 }
 
-func GetBulkClanInfo(realm string, ids ...string) (map[string]types.ExtendedClan, error) {
+func GetBulkClanInfo(realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
 	var response ClanInfoResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/info/?clan_id=%s", strings.Join(ids, ",")), "GET", nil, &response)
+	var query url.Values
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("clan_id", strings.Join(ids, ","))
+
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/info/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

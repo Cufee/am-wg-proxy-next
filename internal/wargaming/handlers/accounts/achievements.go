@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
@@ -16,8 +17,8 @@ type AchievementsResponse struct {
 	} `json:"data"`
 }
 
-func GetAccountAchievements(realm string, id string) (*types.AchievementsFrame, error) {
-	achievementsMap, err := GetBulkAccountsAchievements(realm, id)
+func GetAccountAchievements(realm string, id string, fields ...string) (*types.AchievementsFrame, error) {
+	achievementsMap, err := GetBulkAccountsAchievements(realm, []string{id}, fields...)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
@@ -29,9 +30,16 @@ func GetAccountAchievements(realm string, id string) (*types.AchievementsFrame, 
 	return &info, nil
 }
 
-func GetBulkAccountsAchievements(realm string, ids ...string) (map[string]types.AchievementsFrame, error) {
+func GetBulkAccountsAchievements(realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
 	var response AchievementsResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/achievements/?account_id=%s&fields=achievements", strings.Join(ids, ",")), "GET", nil, &response)
+	var query url.Values
+	query.Set("fields", "achievements")
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("account_id", strings.Join(ids, ","))
+
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/achievements/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetBulkAccountsAchievements > client.WargamingRequest")
 	}

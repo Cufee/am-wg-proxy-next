@@ -1,6 +1,8 @@
 package query
 
 import (
+	"strings"
+
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/glossary"
 	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
@@ -17,7 +19,7 @@ func VehicleGlossaryHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := glossary.GetGlossaryVehicle(realm, vid, lang)
+	result, err := glossary.GetGlossaryVehicle(realm, vid, lang, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -38,7 +40,7 @@ func AllVehiclesGlossaryHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := glossary.GetAllGlossaryVehicles(realm, lang)
+	result, err := glossary.GetAllGlossaryVehicles(realm, lang, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()

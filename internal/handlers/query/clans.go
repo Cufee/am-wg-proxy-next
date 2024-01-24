@@ -1,6 +1,8 @@
 package query
 
 import (
+	"strings"
+
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/clans"
 	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
@@ -16,7 +18,7 @@ func AccountClanInfoHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := clans.GetAccountClanInfo(realm, pid)
+	result, err := clans.GetAccountClanInfo(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -37,7 +39,7 @@ func SearchClansHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := clans.SearchClans(realm, query)
+	result, err := clans.SearchClans(realm, query, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()
@@ -58,7 +60,7 @@ func ClanInfoHandler(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
-	result, err := clans.GetClanInfo(realm, cid)
+	result, err := clans.GetClanInfo(realm, cid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
 		response.Error.Message = "Nothing found"
 		response.Error.Context = err.Error()

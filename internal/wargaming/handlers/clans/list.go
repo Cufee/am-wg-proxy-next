@@ -3,6 +3,8 @@ package clans
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
 	"github.com/cufee/am-wg-proxy-next/types"
@@ -13,9 +15,16 @@ type ClanSearchResponse struct {
 	Data []types.Clan `json:"data"`
 }
 
-func SearchClans(realm, search string) ([]types.Clan, error) {
+func SearchClans(realm, search string, fields ...string) ([]types.Clan, error) {
 	var response ClanSearchResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/list/?search=%v&limit=3", search), "GET", nil, &response)
+	var query url.Values
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("search", search)
+	query.Set("limit", "3")
+
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/list/?%v", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

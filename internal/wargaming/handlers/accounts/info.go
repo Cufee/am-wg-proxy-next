@@ -3,6 +3,7 @@ package accounts
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
@@ -14,8 +15,8 @@ type InfoResponse struct {
 	Data map[string]types.ExtendedAccount `json:"data"`
 }
 
-func GetAccountInfo(realm string, id string) (*types.ExtendedAccount, error) {
-	accountsMap, err := GetBulkAccountsInfo(realm, id)
+func GetAccountInfo(realm string, id string, fields ...string) (*types.ExtendedAccount, error) {
+	accountsMap, err := GetBulkAccountsInfo(realm, []string{id}, fields...)
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +28,16 @@ func GetAccountInfo(realm string, id string) (*types.ExtendedAccount, error) {
 	return &info, nil
 }
 
-func GetBulkAccountsInfo(realm string, ids ...string) (map[string]types.ExtendedAccount, error) {
+func GetBulkAccountsInfo(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
 	var response InfoResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/info/?account_id=%s&extra=statistics.rating", strings.Join(ids, ",")), "GET", nil, &response)
+	var query url.Values
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("extra", "statistics.rating")
+	query.Set("account_id", strings.Join(ids, ","))
+
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/info/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

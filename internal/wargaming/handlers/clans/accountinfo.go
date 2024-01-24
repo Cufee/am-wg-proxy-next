@@ -3,6 +3,7 @@ package clans
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
@@ -14,8 +15,8 @@ type AccountClanInfoResponse struct {
 	Data map[string]types.ClanMember `json:"data"`
 }
 
-func GetAccountClanInfo(realm string, playerId string) (*types.ClanMember, error) {
-	data, err := GetBulkAccountClanInfo(realm, playerId)
+func GetAccountClanInfo(realm string, playerId string, fields ...string) (*types.ClanMember, error) {
+	data, err := GetBulkAccountClanInfo(realm, []string{playerId}, fields...)
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +28,16 @@ func GetAccountClanInfo(realm string, playerId string) (*types.ClanMember, error
 	return nil, nil
 }
 
-func GetBulkAccountClanInfo(realm string, ids ...string) (map[string]types.ClanMember, error) {
+func GetBulkAccountClanInfo(realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
 	var response AccountClanInfoResponse
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/accountinfo/?account_id=%v&extra=clan", strings.Join(ids, ",")), "GET", nil, &response)
+	var query url.Values
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("extra", "clan")
+	query.Set("account_id", strings.Join(ids, ","))
+
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/accountinfo/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
