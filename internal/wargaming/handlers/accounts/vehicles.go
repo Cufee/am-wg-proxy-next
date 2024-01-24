@@ -22,7 +22,7 @@ type VehicleAchievementsResponse struct {
 
 func GetAccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
 	var response VehiclesResponse
-	var query url.Values
+	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}

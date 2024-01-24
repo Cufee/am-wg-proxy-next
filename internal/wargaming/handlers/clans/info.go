@@ -30,7 +30,7 @@ func GetClanInfo(realm string, clanId string, fields ...string) (*types.Extended
 
 func GetBulkClanInfo(realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
 	var response ClanInfoResponse
-	var query url.Values
+	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}

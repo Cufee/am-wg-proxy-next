@@ -18,7 +18,7 @@ type SearchResponse struct {
 
 func SearchAccounts(realm, search string, fields ...string) ([]types.Account, error) {
 	var response SearchResponse
-	var query url.Values
+	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}

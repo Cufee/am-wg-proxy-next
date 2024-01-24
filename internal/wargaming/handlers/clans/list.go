@@ -17,7 +17,7 @@ type ClanSearchResponse struct {
 
 func SearchClans(realm, search string, fields ...string) ([]types.Clan, error) {
 	var response ClanSearchResponse
-	var query url.Values
+	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}

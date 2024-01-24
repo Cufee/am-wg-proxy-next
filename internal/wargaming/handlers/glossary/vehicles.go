@@ -17,7 +17,7 @@ type GlossaryVehicleResponse struct {
 
 func GetGlossaryVehicle(realm string, vehicleID, lang string, fields ...string) (*types.VehicleDetails, error) {
 	var response GlossaryVehicleResponse
-	var query url.Values
+	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -42,7 +42,7 @@ func GetGlossaryVehicle(realm string, vehicleID, lang string, fields ...string) 
 
 func GetAllGlossaryVehicles(realm, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
 	var response GlossaryVehicleResponse
-	var query url.Values
+	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))

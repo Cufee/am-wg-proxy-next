@@ -30,7 +30,7 @@ func GetAccountInfo(realm string, id string, fields ...string) (*types.ExtendedA
 
 func GetBulkAccountsInfo(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
 	var response InfoResponse
-	var query url.Values
+	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}
