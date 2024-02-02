@@ -1,0 +1,18 @@
+# fly.toml app configuration file generated for aftermath-wg-proxy-cache on 2024-02-01T16:02:03-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'aftermath-wg-proxy-cache'
+primary_region = 'lhr'
+
+[env]
+PORT = '9090'
+NETWORK = 'tcp'
+LOG_LEVEL = 'info'
+FALLBACK_MAX_RPS = '10'
+
+[[vm]]
+cpu_kind = 'shared'
+cpus = 2
+memory_mb = 512

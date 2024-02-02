@@ -26,6 +26,11 @@ tasks:
     cmds:
       - git describe --abbrev=0
 
+  deploy:
+    desc: Deploy the application
+    cmds:
+      - fly deploy -c cache.fly.toml & fly deploy -c live.fly.toml
+
   build:docker:
     desc: Build the application for Docker
     cmds:
