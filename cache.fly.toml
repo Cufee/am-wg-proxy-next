@@ -14,5 +14,5 @@ FALLBACK_MAX_RPS = '10'
 
 [[vm]]
 cpu_kind = 'shared'
-cpus = 2
-memory_mb = 512
+cpus = 1
+memory_mb = 256
