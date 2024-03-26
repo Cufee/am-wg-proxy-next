@@ -68,7 +68,10 @@ func HttpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	resp, err = client.Do(req)
 	if err != nil {
 		log.Warn().Str("url", url).Str("method", method).Str("payload", string(payload)).Err(err).Msg("client.Do failed")
-		return resp.StatusCode, err
+		if resp != nil {
+			return resp.StatusCode, err
+		}
+		return 0, err
 	}
 	defer resp.Body.Close()
 
