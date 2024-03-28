@@ -19,8 +19,7 @@ func SearchAccountsHandler(c *fiber.Ctx) error {
 
 	result, err := accounts.SearchAccounts(realm, query, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "player not found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
@@ -34,15 +33,14 @@ func AccountInfoHandler(c *fiber.Ctx) error {
 	pid := c.Params("pid")
 	realm := c.Params("realm")
 	if pid == "" || realm == "" {
-		response.Error.Message = "Player id and realm are required"
+		response.Error.Message = "player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := accounts.GetAccountInfo(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
-		return c.Status(fiber.StatusInternalServerError).JSON(response)
+		response.Error.Message = err.Error()
+		return c.Status(fiber.StatusNotFound).JSON(response)
 	}
 
 	response.Data = result
@@ -55,14 +53,13 @@ func AccountAchievementsHandler(c *fiber.Ctx) error {
 	pid := c.Params("pid")
 	realm := c.Params("realm")
 	if pid == "" || realm == "" {
-		response.Error.Message = "Player id and realm are required"
+		response.Error.Message = "player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := accounts.GetAccountAchievements(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
@@ -76,14 +73,13 @@ func AccountVehiclesHandler(c *fiber.Ctx) error {
 	pid := c.Params("pid")
 	realm := c.Params("realm")
 	if pid == "" || realm == "" {
-		response.Error.Message = "Player id and realm are required"
+		response.Error.Message = "player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := accounts.GetAccountVehicles(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 

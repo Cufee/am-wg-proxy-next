@@ -15,14 +15,13 @@ func BulkAccountsInfoHandler(c *fiber.Ctx) error {
 	pids := c.Query("ids")
 	realm := c.Params("realm")
 	if pids == "" || realm == "" {
-		response.Error.Message = "Player id and realm are required"
+		response.Error.Message = "player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := accounts.GetBulkAccountsInfo(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
@@ -36,14 +35,13 @@ func BulkAccountsAchievementsHandler(c *fiber.Ctx) error {
 	pids := c.Query("ids")
 	realm := c.Params("realm")
 	if pids == "" || realm == "" {
-		response.Error.Message = "Player id and realm are required"
+		response.Error.Message = "player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := accounts.GetBulkAccountsAchievements(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
@@ -57,14 +55,13 @@ func BulkAccountClanInfoHandler(c *fiber.Ctx) error {
 	cids := c.Query("ids")
 	realm := c.Params("realm")
 	if cids == "" || realm == "" {
-		response.Error.Message = "Clan id and realm are required"
+		response.Error.Message = "clan id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := clans.GetBulkAccountClanInfo(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusNotFound).JSON(response)
 	}
 
@@ -78,13 +75,12 @@ func BulkClanInfoHandler(c *fiber.Ctx) error {
 	cids := c.Query("ids")
 	realm := c.Params("realm")
 	if cids == "" || realm == "" {
-		response.Error.Message = "Clan id and realm are required"
+		response.Error.Message = "clan id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 	result, err := clans.GetBulkClanInfo(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 

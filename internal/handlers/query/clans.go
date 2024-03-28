@@ -14,14 +14,13 @@ func AccountClanInfoHandler(c *fiber.Ctx) error {
 	pid := c.Params("pid")
 	realm := c.Params("realm")
 	if pid == "" || realm == "" {
-		response.Error.Message = "Player id and realm are required"
+		response.Error.Message = "player id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := clans.GetAccountClanInfo(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
@@ -35,14 +34,13 @@ func SearchClansHandler(c *fiber.Ctx) error {
 	query := c.Query("query")
 	realm := c.Params("realm")
 	if query == "" || realm == "" {
-		response.Error.Message = "Query and realm are required"
+		response.Error.Message = "query and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := clans.SearchClans(realm, query, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
@@ -56,14 +54,13 @@ func ClanInfoHandler(c *fiber.Ctx) error {
 	cid := c.Params("cid")
 	realm := c.Params("realm")
 	if cid == "" || realm == "" {
-		response.Error.Message = "Clan id and realm are required"
+		response.Error.Message = "clan id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := clans.GetClanInfo(realm, cid, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 

@@ -132,7 +132,10 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 		return ErrFailedToDecodeResponse
 	}
 	if responseDecoded.Error.Message != "" {
-		return errors.New(responseDecoded.Error.Message)
+		if responseDecoded.Error.Message == "SOURCE_NOT_AVAILABLE" {
+			return ErrSourceNotAvailable
+		}
+		return errors.New(strings.ToLower(strings.ReplaceAll(responseDecoded.Error.Message, "_", " ")))
 	}
 	if resp.StatusCode > 299 {
 		return ErrBadResponseCode

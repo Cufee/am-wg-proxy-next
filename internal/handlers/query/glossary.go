@@ -15,14 +15,13 @@ func VehicleGlossaryHandler(c *fiber.Ctx) error {
 	realm := c.Params("realm")
 	lang := c.Params("language", "en")
 	if vid == "" || realm == "" {
-		response.Error.Message = "Vehicle id and realm are required"
+		response.Error.Message = "vehicle id and realm are required"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	result, err := glossary.GetGlossaryVehicle(realm, vid, lang, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 
@@ -42,8 +41,7 @@ func AllVehiclesGlossaryHandler(c *fiber.Ctx) error {
 
 	result, err := glossary.GetAllGlossaryVehicles(realm, lang, strings.Split(c.Query("fields", ""), ",")...)
 	if err != nil {
-		response.Error.Message = "Nothing found"
-		response.Error.Context = err.Error()
+		response.Error.Message = err.Error()
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
 

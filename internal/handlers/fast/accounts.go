@@ -12,13 +12,13 @@ func AccountRealmByIDHandler(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, _ := strconv.Atoi(idStr)
 	if id == 0 {
-		response.Error.Message = "Invalid player id"
+		response.Error.Message = "invalid player id"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	realm := RealmFromID(id)
 	if realm == "" {
-		response.Error.Message = "Invalid player id"
+		response.Error.Message = "invalid player id"
 		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
