@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -97,7 +98,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	// Send request
 	resp, err := c.httpClient.Get(urlData.String())
 	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
+		if errors.Is(err, context.DeadlineExceeded) || os.IsTimeout(err) {
 			return ErrRequestTimeOut
 		}
 		return err
