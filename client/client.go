@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -96,7 +97,10 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	// Send request
 	resp, err := c.httpClient.Get(urlData.String())
 	if err != nil {
-		return errors.Join(err, err)
+		if errors.Is(err, context.DeadlineExceeded) {
+			return ErrRequestTimeOut
+		}
+		return err
 	}
 	defer resp.Body.Close()
 
@@ -106,7 +110,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return errors.Join(err, errors.New("ioutil.ReadAll failed"))
+		return ErrFailedToDecodeResponse
 	}
 
 	// Header and status checks
@@ -114,11 +118,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 		if c.debug {
 			log.Debug().Str("url", urlData.String()).Msgf("Response is not JSON. Response body: %s", string(body))
 		}
-		return errors.New("response is not JSON")
-	}
-	if resp.StatusCode != http.StatusOK {
-
-		return errors.New("response status is not 200")
+		return ErrUnexpectedContentType
 	}
 
 	// Decode response
@@ -128,21 +128,24 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	}
 	err = json.Unmarshal(body, &responseDecoded)
 	if err != nil {
-		return errors.Join(err, errors.New("failed to decode response"))
+		return ErrFailedToDecodeResponse
 	}
 	if responseDecoded.Error.Message != "" {
 		return errors.New(responseDecoded.Error.Message)
+	}
+	if resp.StatusCode > 299 {
+		return ErrBadResponseCode
 	}
 
 	// Decode response data to target
 	// there is probably a cleaner way to unmarshal a generic interface
 	responseData, err := json.Marshal(responseDecoded.Data)
 	if err != nil {
-		return errors.Join(err, errors.New("failed to marshal response data"))
+		return ErrFailedToDecodeResponse
 	}
 	err = json.Unmarshal(responseData, target)
 	if err != nil {
-		return errors.Join(err, errors.New("failed to unmarshal response data"))
+		return ErrFailedToDecodeResponse
 	}
 	return nil
 }
