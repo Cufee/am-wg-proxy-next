@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/cufee/am-wg-proxy-next/utils"
 )
 
 func (c *Client) SearchAccounts(realm, query string, fields ...string) (types.Account, error) {
@@ -32,7 +33,7 @@ func (c *Client) GetAccountByID(id int, fields ...string) (types.ExtendedAccount
 	}
 
 	var target types.ExtendedAccount
-	return target, c.sendRequest(RealmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(utils.RealmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, opts)
 }
 
 func (c *Client) GetAccountClan(id int, fields ...string) (types.ClanMember, error) {
@@ -42,7 +43,7 @@ func (c *Client) GetAccountClan(id int, fields ...string) (types.ClanMember, err
 	}
 
 	var target types.ClanMember
-	return target, c.sendRequest(RealmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(utils.RealmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, opts)
 }
 
 func (c *Client) GetAccountVehicles(id int, fields ...string) ([]types.VehicleStatsFrame, error) {
@@ -52,7 +53,7 @@ func (c *Client) GetAccountVehicles(id int, fields ...string) ([]types.VehicleSt
 	}
 
 	var target []types.VehicleStatsFrame
-	return target, c.sendRequest(RealmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(utils.RealmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, opts)
 }
 
 func (c *Client) GetAccountAchievements(id int, fields ...string) (types.AchievementsFrame, error) {
@@ -62,20 +63,5 @@ func (c *Client) GetAccountAchievements(id int, fields ...string) (types.Achieve
 	}
 
 	var target types.AchievementsFrame
-	return target, c.sendRequest(RealmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
-}
-
-func RealmFromPlayerID(id int) string {
-	switch {
-	case id == 0:
-		return ""
-	case id < 500000000:
-		return "RU"
-	case id < 1000000000:
-		return "EU"
-	case id < 2000000000:
-		return "NA"
-	default:
-		return "AS"
-	}
+	return target, c.sendRequest(utils.RealmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
 }
