@@ -3,17 +3,19 @@ package client
 import (
 	"errors"
 	"sync"
+	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 )
 
 type Options struct {
 	Buckets map[string][]*proxyBucket
+	Timeout time.Duration
 }
 
 type Client struct {
 	proxyBuckets map[string][]*proxyBucket
-	debug        bool
+	options      Options
 }
 
 func (c *Client) addBucket(key string, bucket *proxyBucket) {
@@ -27,8 +29,11 @@ func NewClient(wargamingAppID string, requestsPerSecond int, opts Options) (Clie
 	if wargamingAppID == "" {
 		return Client{}, errors.New("wargaming application id is required")
 	}
+	if opts.Timeout == 0 {
+		opts.Timeout = time.Second * 3
+	}
 
-	client := Client{proxyBuckets: make(map[string][]*proxyBucket)}
+	client := Client{proxyBuckets: make(map[string][]*proxyBucket), options: opts}
 	client.addBucket(bucketKeyWildcard, &proxyBucket{
 		mu:             sync.Mutex{},
 		rps:            requestsPerSecond,

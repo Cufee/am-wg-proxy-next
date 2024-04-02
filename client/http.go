@@ -45,7 +45,7 @@ func (c *Client) Request(realm, path, method string, payload []byte, target inte
 		headers["Proxy-Authorization"] = bkt.authHeader
 	}
 
-	return httpRequest(endpoint.String(), method, bkt.proxyUrl, nil, payload, target, c.debug)
+	return httpRequest(endpoint.String(), method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
 }
 
 func baseUriFromRealm(realm string) (string, error) {
@@ -61,27 +61,25 @@ func baseUriFromRealm(realm string) (string, error) {
 	}
 }
 
-func httpRequest(url, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, debug bool) (int, error) {
+func httpRequest(url, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
 	var err error
 	var bodyBytes []byte
 	var resp *http.Response
 
-	if debug {
-		defer func() {
-			event := log.Debug().Str("url", url).Str("proxy", proxy.String()).Str("method", method)
-			if err != nil {
-				event.Err(err)
-			}
-			if resp != nil {
-				event.Int("status code", resp.StatusCode)
-				event.Str("response", string(bodyBytes))
-			}
-			if payload != nil {
-				event.Str("payload", string(payload))
-			}
-			event.Msg("request failed")
-		}()
-	}
+	defer func() {
+		event := log.Debug().Str("url", url).Str("proxy", proxy.String()).Str("method", method)
+		if err != nil {
+			event.Err(err)
+		}
+		if resp != nil {
+			event.Int("status code", resp.StatusCode)
+			event.Str("response", string(bodyBytes))
+		}
+		if payload != nil {
+			event.Str("payload", string(payload))
+		}
+		event.Msg("request failed")
+	}()
 
 	// Prep request
 	req, err := http.NewRequest(strings.ToUpper(method), url, bytes.NewBuffer(payload))
@@ -106,7 +104,7 @@ func httpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	}
 
 	client := &http.Client{
-		Timeout:   30 * time.Second,
+		Timeout:   timeout,
 		Transport: transport,
 	}
 	defer client.CloseIdleConnections()
