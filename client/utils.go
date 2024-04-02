@@ -2,17 +2,12 @@ package client
 
 import (
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 	"sync"
-
-	"github.com/rs/zerolog/log"
 )
-
-var ErrNoProxyBuckets = errors.New("no proxy buckets configured")
 
 func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (*proxyBucket, error) {
 	var bucketSettings proxyBucket
@@ -62,38 +57,22 @@ func buildProxyURL(host, port, username, password string) *url.URL {
 	return proxyUrl
 }
 
-func pickBucket(realm string) (*proxyBucket, error) {
-	if len(proxyBuckets) == 0 {
-		log.Warn().Msg("No proxy buckets configured")
-		return nil, nil
+func ParseProxyString(input string, fallbackWgAppID string, fallbackRps int) map[string][]*proxyBucket {
+	if input == "" {
+		return nil
 	}
+	proxyBuckets := make(map[string][]*proxyBucket)
 
-	if realm == "" {
-		realm = "*"
-	}
-
-	buckets, ok := proxyBuckets[realm]
-	if !ok {
-		buckets, ok = proxyBuckets["*"]
-		if !ok {
-			return nil, errors.New("no proxy buckets configured")
+	for _, proxyString := range strings.Split(input, ",") {
+		bucketSettings, err := parseProxySettings(proxyString, fallbackWgAppID, fallbackRps)
+		if err != nil {
+			panic(err)
 		}
-	}
-	if len(buckets) == 0 {
-		return nil, ErrNoProxyBuckets
-	}
-
-	if len(buckets) == 1 {
-		return buckets[0], nil
-	}
-
-	// Pick the bucket with the lowest active requests
-	var lowestRpsBucket int
-	for i := range buckets {
-		if buckets[i].activeRequests < buckets[lowestRpsBucket].activeRequests {
-			lowestRpsBucket = i
+		if bucketSettings.realm == "" {
+			proxyBuckets["*"] = append(proxyBuckets["*"], bucketSettings)
 		}
+		proxyBuckets[bucketSettings.realm] = append(proxyBuckets[bucketSettings.realm], bucketSettings)
 	}
 
-	return buckets[lowestRpsBucket], nil
+	return proxyBuckets
 }

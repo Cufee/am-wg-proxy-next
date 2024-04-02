@@ -1,81 +1,152 @@
 package client
 
 import (
-	"errors"
+	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
-func (c *Client) SearchAccounts(realm, query string, fields ...string) (types.Account, error) {
-	opts := newDefaultRequestOptions()
-	opts.Query.Add("query", query)
-	if len(fields) > 0 {
-		opts.Query.Add("fields", strings.Join(fields, ","))
-	}
+type achievementsResponse struct {
+	types.WgResponse
+	Data map[string]struct {
+		Achievements types.AchievementsFrame `json:"achievements"`
+	} `json:"data"`
+}
 
-	var target []types.Account
-	err := c.sendRequest(realm, accountsSearchEndpoint, &target, opts)
+func (c *Client) GetAccountAchievements(realm string, id string, fields ...string) (*types.AchievementsFrame, error) {
+	achievementsMap, err := c.GetBulkAccountsAchievements(realm, []string{id}, fields...)
 	if err != nil {
-		return types.Account{}, err
+		return nil, errors.Wrap(err, "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
-	if len(target) == 0 {
-		return types.Account{}, errors.New("no results found")
+
+	info, ok := achievementsMap[id]
+	if !ok {
+		return nil, errors.Wrap(errors.New("account not found"), "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
-	return target[0], nil
+	return &info, nil
 }
 
-func (c *Client) GetAccountByID(id int, fields ...string) (types.ExtendedAccount, error) {
-	opts := newDefaultRequestOptions()
+func (c *Client) GetBulkAccountsAchievements(realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
+	var response achievementsResponse
+	query := url.Values{}
+	query.Set("fields", "achievements")
 	if len(fields) > 0 {
-		opts.Query.Add("fields", strings.Join(fields, ","))
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("account_id", strings.Join(ids, ","))
+
+	_, err := c.Request(realm, fmt.Sprintf("account/achievements/?%s", query.Encode()), "GET", nil, &response)
+	if err != nil {
+		return nil, errors.Wrap(err, "GetBulkAccountsAchievements > client.WargamingRequest")
+	}
+	if response.Error.Code != 0 {
+		return nil, errors.Wrap(errors.New(response.Error.Message), "GetBulkAccountsAchievements > WargamingRequest")
 	}
 
-	var target types.ExtendedAccount
-	return target, c.sendRequest(RealmFromPlayerID(id), accountsGetEndpointFMT.Fmt(id), &target, opts)
+	// Get the right data
+	achievementsMap := make(map[string]types.AchievementsFrame)
+	for id, data := range response.Data {
+		achievementsMap[id] = data.Achievements
+	}
+	return achievementsMap, nil
 }
 
-func (c *Client) GetAccountClan(id int, fields ...string) (types.ClanMember, error) {
-	opts := newDefaultRequestOptions()
+type infoResponse struct {
+	types.WgResponse
+	Data map[string]types.ExtendedAccount `json:"data"`
+}
+
+func (c *Client) GetAccountInfo(realm string, id string, fields ...string) (*types.ExtendedAccount, error) {
+	accountsMap, err := c.GetBulkAccountsInfo(realm, []string{id}, fields...)
+	if err != nil {
+		return nil, err
+	}
+
+	info, ok := accountsMap[id]
+	if !ok || info.ID == 0 {
+		return nil, errors.New("account not found")
+	}
+	return &info, nil
+}
+
+func (c *Client) GetBulkAccountsInfo(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
+	var response infoResponse
+	query := url.Values{}
 	if len(fields) > 0 {
-		opts.Query.Add("fields", strings.Join(fields, ","))
+		query.Set("fields", strings.Join(fields, ","))
 	}
+	query.Set("extra", "statistics.rating")
+	query.Set("account_id", strings.Join(ids, ","))
 
-	var target types.ClanMember
-	return target, c.sendRequest(RealmFromPlayerID(id), accountClanGetEndpointFMT.Fmt(id), &target, opts)
+	_, err := c.Request(realm, fmt.Sprintf("account/info/?%s", query.Encode()), "GET", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error.Code != 0 {
+		return nil, errors.New(response.Error.Message)
+	}
+	return response.Data, nil
 }
 
-func (c *Client) GetAccountVehicles(id int, fields ...string) ([]types.VehicleStatsFrame, error) {
-	opts := newDefaultRequestOptions()
+type searchResponse struct {
+	types.WgResponse
+	Data []types.Account `json:"data"`
+}
+
+func (c *Client) SearchAccounts(realm, search string, fields ...string) ([]types.Account, error) {
+	var response searchResponse
+	query := url.Values{}
 	if len(fields) > 0 {
-		opts.Query.Add("fields", strings.Join(fields, ","))
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("search", search)
+	query.Set("limit", "3")
+
+	_, err := c.Request(realm, fmt.Sprintf("account/list/?%s", query.Encode()), "GET", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error.Code != 0 {
+		log.Error().Str("realm", realm).Str("query", search).Msg("Error while searching accounts")
+		return nil, errors.New(response.Error.Message)
 	}
 
-	var target []types.VehicleStatsFrame
-	return target, c.sendRequest(RealmFromPlayerID(id), accountGetVehiclesEndpointFMT.Fmt(id), &target, opts)
+	return response.Data, nil
 }
 
-func (c *Client) GetAccountAchievements(id int, fields ...string) (types.AchievementsFrame, error) {
-	opts := newDefaultRequestOptions()
+type vehiclesResponse struct {
+	types.WgResponse
+	Data map[string][]types.VehicleStatsFrame `json:"data"`
+}
+
+// type vehicleAchievementsResponse struct {
+// 	types.WgResponse
+// 	Data map[string]types.AchievementsFrame `json:"data"`
+// }
+
+func (c *Client) GetAccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
+	var response vehiclesResponse
+	query := url.Values{}
 	if len(fields) > 0 {
-		opts.Query.Add("fields", strings.Join(fields, ","))
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("account_id", id)
+
+	_, err := c.Request(realm, fmt.Sprintf("tanks/stats/?%s", query.Encode()), "GET", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error.Code != 0 {
+		return nil, errors.New(response.Error.Message)
 	}
 
-	var target types.AchievementsFrame
-	return target, c.sendRequest(RealmFromPlayerID(id), accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
-}
-
-func RealmFromPlayerID(id int) string {
-	switch {
-	case id == 0:
-		return ""
-	case id < 500000000:
-		return "RU"
-	case id < 1000000000:
-		return "EU"
-	case id < 2000000000:
-		return "NA"
-	default:
-		return "AS"
+	info, ok := response.Data[id]
+	if !ok {
+		return info, errors.New("account not found")
 	}
+	return info, nil
 }
