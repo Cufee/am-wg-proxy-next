@@ -10,7 +10,7 @@ import (
 	"github.com/cufee/am-wg-proxy-next/types"
 )
 
-type ClanInfoResponse struct {
+type clanInfoResponse struct {
 	types.WgResponse
 	Data map[string]types.ExtendedClan `json:"data"`
 }
@@ -29,7 +29,7 @@ func GetClanInfo(realm string, clanId string, fields ...string) (*types.Extended
 }
 
 func GetBulkClanInfo(realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
-	var response ClanInfoResponse
+	var response clanInfoResponse
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))

@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type AchievementsResponse struct {
+type achievementsResponse struct {
 	types.WgResponse
 	Data map[string]struct {
 		Achievements types.AchievementsFrame `json:"achievements"`
@@ -31,7 +31,7 @@ func GetAccountAchievements(realm string, id string, fields ...string) (*types.A
 }
 
 func GetBulkAccountsAchievements(realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
-	var response AchievementsResponse
+	var response achievementsResponse
 	query := url.Values{}
 	query.Set("fields", "achievements")
 	if len(fields) > 0 {

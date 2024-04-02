@@ -3,7 +3,7 @@ package query
 import (
 	"strings"
 
-	"github.com/cufee/am-wg-proxy-next/internal/wargaming/handlers/accounts"
+	"github.com/cufee/am-wg-proxy-next/accounts"
 	"github.com/cufee/am-wg-proxy-next/types"
 	"github.com/gofiber/fiber/v2"
 )

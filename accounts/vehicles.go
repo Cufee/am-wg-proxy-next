@@ -10,18 +10,18 @@ import (
 	"github.com/cufee/am-wg-proxy-next/types"
 )
 
-type VehiclesResponse struct {
+type vehiclesResponse struct {
 	types.WgResponse
 	Data map[string][]types.VehicleStatsFrame `json:"data"`
 }
 
-type VehicleAchievementsResponse struct {
-	types.WgResponse
-	Data map[string]types.AchievementsFrame `json:"data"`
-}
+// type vehicleAchievementsResponse struct {
+// 	types.WgResponse
+// 	Data map[string]types.AchievementsFrame `json:"data"`
+// }
 
 func GetAccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
-	var response VehiclesResponse
+	var response vehiclesResponse
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))

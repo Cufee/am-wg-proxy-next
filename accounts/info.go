@@ -10,7 +10,7 @@ import (
 	"github.com/cufee/am-wg-proxy-next/types"
 )
 
-type InfoResponse struct {
+type infoResponse struct {
 	types.WgResponse
 	Data map[string]types.ExtendedAccount `json:"data"`
 }
@@ -29,7 +29,7 @@ func GetAccountInfo(realm string, id string, fields ...string) (*types.ExtendedA
 }
 
 func GetBulkAccountsInfo(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
-	var response InfoResponse
+	var response infoResponse
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))

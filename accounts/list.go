@@ -1,4 +1,4 @@
-package clans
+package accounts
 
 import (
 	"errors"
@@ -8,15 +8,16 @@ import (
 
 	"github.com/cufee/am-wg-proxy-next/internal/wargaming/client"
 	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/rs/zerolog/log"
 )
 
-type ClanSearchResponse struct {
+type searchResponse struct {
 	types.WgResponse
-	Data []types.Clan `json:"data"`
+	Data []types.Account `json:"data"`
 }
 
-func SearchClans(realm, search string, fields ...string) ([]types.Clan, error) {
-	var response ClanSearchResponse
+func SearchAccounts(realm, search string, fields ...string) ([]types.Account, error) {
+	var response searchResponse
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -24,12 +25,14 @@ func SearchClans(realm, search string, fields ...string) ([]types.Clan, error) {
 	query.Set("search", search)
 	query.Set("limit", "3")
 
-	_, err := client.WargamingRequest(realm, fmt.Sprintf("clans/list/?%v", query.Encode()), "GET", nil, &response)
+	_, err := client.WargamingRequest(realm, fmt.Sprintf("account/list/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
 	if response.Error.Code != 0 {
+		log.Error().Str("realm", realm).Str("query", search).Msg("Error while searching accounts")
 		return nil, errors.New(response.Error.Message)
 	}
+
 	return response.Data, nil
 }
