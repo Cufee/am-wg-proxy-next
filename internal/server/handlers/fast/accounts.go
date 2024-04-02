@@ -3,7 +3,7 @@ package fast
 import (
 	"strconv"
 
-	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/gofiber/fiber/v2"
 )
 

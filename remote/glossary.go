@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
 // Glossary

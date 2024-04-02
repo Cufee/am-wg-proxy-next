@@ -4,9 +4,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cufee/am-wg-proxy-next/client"
-	"github.com/cufee/am-wg-proxy-next/internal/server"
-	"github.com/cufee/am-wg-proxy-next/internal/utils"
+	"github.com/cufee/am-wg-proxy-next/v2/client"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/server"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/utils"
 	"github.com/gofiber/contrib/fiberzerolog"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog"

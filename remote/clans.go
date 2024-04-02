@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
 func (c *Client) GetClanByID(realm string, id int, fields ...string) (types.ExtendedClan, error) {

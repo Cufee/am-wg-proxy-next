@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog/log"
 )

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/cufee/am-wg-proxy-next/types"
-	"github.com/cufee/am-wg-proxy-next/utils"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
+	"github.com/cufee/am-wg-proxy-next/v2/utils"
 )
 
 func (c *Client) SearchAccounts(realm, query string, fields ...string) (types.Account, error) {

@@ -3,8 +3,8 @@ package query
 import (
 	"strings"
 
-	"github.com/cufee/am-wg-proxy-next/client"
-	"github.com/cufee/am-wg-proxy-next/types"
+	"github.com/cufee/am-wg-proxy-next/v2/client"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/gofiber/fiber/v2"
 )
 

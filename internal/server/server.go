@@ -3,9 +3,9 @@ package server
 import (
 	_ "github.com/joho/godotenv/autoload"
 
-	"github.com/cufee/am-wg-proxy-next/client"
-	"github.com/cufee/am-wg-proxy-next/internal/server/handlers/fast"
-	"github.com/cufee/am-wg-proxy-next/internal/server/handlers/query"
+	"github.com/cufee/am-wg-proxy-next/v2/client"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/server/handlers/fast"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/server/handlers/query"
 	"github.com/gofiber/fiber/v2"
 
 	_ "net/http/pprof"

@@ -38,4 +38,4 @@ tasks:
   build:image:
     desc: Build the Docker image
     cmds:
-      - docker build --progress=plain --platform linux/amd64 -t {{ .CLI_ARGS | default "github.com/cufee/am-wg-proxy-next" }} .
+      - docker build --progress=plain --platform linux/amd64 -t {{ .CLI_ARGS | default "github.com/cufee/am-wg-proxy-next/v2" }} .

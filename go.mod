@@ -1,6 +1,6 @@
-module github.com/cufee/am-wg-proxy-next
+module github.com/cufee/am-wg-proxy-next/v2
 
-go 1.21.5
+go 1.22.0
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.0
