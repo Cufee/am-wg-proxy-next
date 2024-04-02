@@ -7,6 +7,7 @@ app = 'aftermath-wg-proxy-live'
 primary_region = 'lhr'
 
 [env]
+REQUEST_TIMEOUT_SEC = '5'
 PRIMARY_WG_APP_RPS = '10'
 LOG_LEVEL = 'info'
 NETWORK = 'tcp'

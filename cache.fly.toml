@@ -11,6 +11,7 @@ PORT = '9090'
 NETWORK = 'tcp'
 LOG_LEVEL = 'info'
 PRIMARY_WG_APP_RPS = '10'
+REQUEST_TIMEOUT_SEC = '30'
 
 [[vm]]
 cpu_kind = 'shared'

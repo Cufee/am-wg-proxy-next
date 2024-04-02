@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/cufee/am-wg-proxy-next/v2/client"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/server"
@@ -21,8 +22,11 @@ func main() {
 	primaryAppID := utils.MustGetEnv("PRIMARY_WG_APP_ID")
 	primaryRps, _ := strconv.Atoi(utils.MustGetEnv("PRIMARY_WG_APP_RPS"))
 
+	timeoutInt, _ := strconv.Atoi(os.Getenv("REQUEST_TIMEOUT_SEC"))
+	timeout := time.Second * time.Duration(timeoutInt)
+
 	buckets := client.ParseProxyString(os.Getenv("PROXY_HOST_LIST"), primaryAppID, primaryRps)
-	wgClient, err := client.NewClient(primaryAppID, primaryRps, client.Options{Buckets: buckets})
+	wgClient, err := client.NewClient(primaryAppID, primaryRps, client.Options{Buckets: buckets, Timeout: timeout})
 	if err != nil {
 		panic(err)
 	}
