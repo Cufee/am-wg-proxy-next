@@ -7,7 +7,7 @@ app = 'aftermath-wg-proxy-live'
 primary_region = 'lhr'
 
 [env]
-FALLBACK_MAX_RPS = '10'
+PRIMARY_WG_APP_RPS = '10'
 LOG_LEVEL = 'info'
 NETWORK = 'tcp'
 PORT = '9090'

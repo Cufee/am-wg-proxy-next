@@ -10,7 +10,7 @@ primary_region = 'lhr'
 PORT = '9090'
 NETWORK = 'tcp'
 LOG_LEVEL = 'info'
-FALLBACK_MAX_RPS = '10'
+PRIMARY_WG_APP_RPS = '10'
 
 [[vm]]
 cpu_kind = 'shared'
