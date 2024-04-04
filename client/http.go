@@ -67,9 +67,12 @@ func httpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 	var resp *http.Response
 
 	defer func() {
-		event := log.Debug().Str("url", url).Str("proxy", proxy.String()).Str("method", method)
+		event := log.Debug().Str("url", url).Str("method", method)
 		if err != nil {
 			event.Err(err)
+		}
+		if proxy != nil {
+			event.Str("proxy", proxy.String())
 		}
 		if resp != nil {
 			event.Int("status code", resp.StatusCode)
