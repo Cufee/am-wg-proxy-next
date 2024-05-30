@@ -25,8 +25,7 @@ func main() {
 	timeoutInt, _ := strconv.Atoi(os.Getenv("REQUEST_TIMEOUT_SEC"))
 	timeout := time.Second * time.Duration(timeoutInt)
 
-	buckets := client.ParseProxyString(os.Getenv("PROXY_HOST_LIST"), primaryAppID, primaryRps)
-	wgClient, err := client.NewClient(primaryAppID, primaryRps, client.Options{Buckets: buckets, Timeout: timeout})
+	wgClient, err := client.NewEmbeddedClient(primaryAppID, primaryRps, os.Getenv("PROXY_HOST_LIST"), timeout)
 	if err != nil {
 		panic(err)
 	}

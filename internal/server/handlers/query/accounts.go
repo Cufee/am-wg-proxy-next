@@ -31,7 +31,7 @@ func SearchAccountsHandler(wg client.Client) func(c *fiber.Ctx) error {
 
 func AccountInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		var response types.ResponseWithError[*types.ExtendedAccount]
+		var response types.ResponseWithError[types.ExtendedAccount]
 
 		pid := c.Params("pid")
 		realm := c.Params("realm")
@@ -40,7 +40,7 @@ func AccountInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetAccountInfo(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountByID(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusNotFound).JSON(response)
@@ -53,7 +53,7 @@ func AccountInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 
 func AccountAchievementsHandler(wg client.Client) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		var response types.ResponseWithError[*types.AchievementsFrame]
+		var response types.ResponseWithError[types.AchievementsFrame]
 
 		pid := c.Params("pid")
 		realm := c.Params("realm")
@@ -62,7 +62,7 @@ func AccountAchievementsHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetAccountAchievements(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountAchievements(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -84,7 +84,7 @@ func AccountVehiclesHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetAccountVehicles(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountVehicles(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

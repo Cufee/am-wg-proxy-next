@@ -19,7 +19,7 @@ func BulkAccountsInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetBulkAccountsInfo(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.BatchAccountByID(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -41,7 +41,7 @@ func BulkAccountsAchievementsHandler(wg client.Client) func(c *fiber.Ctx) error 
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetBulkAccountsAchievements(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.BatchAccountAchievements(realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -63,7 +63,7 @@ func BulkAccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetBulkAccountClanInfo(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.BatchAccountClan(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusNotFound).JSON(response)
@@ -84,7 +84,7 @@ func BulkClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			response.Error.Message = "clan id and realm are required"
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
-		result, err := wg.GetBulkClanInfo(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.BatchClanByID(realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

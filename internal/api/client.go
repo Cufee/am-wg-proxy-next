@@ -1,4 +1,4 @@
-package remote
+package api
 
 import (
 	"context"
@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cufee/am-wg-proxy-next/v2/client/common"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog/log"
@@ -99,7 +100,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	resp, err := c.httpClient.Get(urlData.String())
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || os.IsTimeout(err) {
-			return ErrRequestTimeOut
+			return common.ErrRequestTimeOut
 		}
 		return err
 	}
@@ -111,7 +112,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return ErrFailedToDecodeResponse
+		return common.ErrFailedToDecodeResponse
 	}
 
 	// Header and status checks
@@ -119,7 +120,7 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 		if c.debug {
 			log.Debug().Str("url", urlData.String()).Msgf("Response is not JSON. Response body: %s", string(body))
 		}
-		return ErrUnexpectedContentType
+		return common.ErrUnexpectedContentType
 	}
 
 	// Decode response
@@ -129,27 +130,27 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	}
 	err = json.Unmarshal(body, &responseDecoded)
 	if err != nil {
-		return ErrFailedToDecodeResponse
+		return common.ErrFailedToDecodeResponse
 	}
 	if responseDecoded.Error.Message != "" {
 		if responseDecoded.Error.Message == "SOURCE_NOT_AVAILABLE" {
-			return ErrSourceNotAvailable
+			return common.ErrSourceNotAvailable
 		}
 		return errors.New(strings.ToLower(strings.ReplaceAll(responseDecoded.Error.Message, "_", " ")))
 	}
 	if resp.StatusCode > 299 {
-		return ErrBadResponseCode
+		return common.ErrBadResponseCode
 	}
 
 	// Decode response data to target
 	// there is probably a cleaner way to unmarshal a generic interface
 	responseData, err := json.Marshal(responseDecoded.Data)
 	if err != nil {
-		return ErrFailedToDecodeResponse
+		return common.ErrFailedToDecodeResponse
 	}
 	err = json.Unmarshal(responseData, target)
 	if err != nil {
-		return ErrFailedToDecodeResponse
+		return common.ErrFailedToDecodeResponse
 	}
 	return nil
 }

@@ -1,81 +1,65 @@
 package client
 
 import (
-	"errors"
-	"sync"
+	"strconv"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/api"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/client"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-type Options struct {
-	Buckets map[string][]*proxyBucket
-	Timeout time.Duration
+type baseClient interface {
+	SearchAccounts(realm, query string, fields ...string) ([]types.Account, error)
+	AccountByID(realm string, id string, fields ...string) (types.ExtendedAccount, error)
+	BatchAccountByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error)
+	AccountClan(realm string, id string, fields ...string) (types.ClanMember, error)
+	BatchAccountClan(realm string, ids []string, fields ...string) (map[string]types.ClanMember, error)
+	AccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error)
+	AccountAchievements(realm string, id string, fields ...string) (types.AchievementsFrame, error)
+	BatchAccountAchievements(realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error)
+
+	SearchClans(realm, query string, fields ...string) ([]types.Clan, error)
+	ClanByID(realm string, id string, fields ...string) (types.ExtendedClan, error)
+	BatchClanByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error)
+
+	VehicleGlossary(realm string, vehicleId string, lang string, fields ...string) (types.VehicleDetails, error)
+	CompleteVehicleGlossary(realm string, lang string, fields ...string) (map[string]types.VehicleDetails, error)
 }
 
-type Client struct {
-	proxyBuckets map[string][]*proxyBucket
-	options      Options
+type Client interface {
+	baseClient
+	RealmFromAccountID(id string) string
 }
 
-func (c *Client) addBucket(key string, bucket *proxyBucket) {
-	if c.proxyBuckets == nil {
-		c.proxyBuckets = make(map[string][]*proxyBucket)
-	}
-	c.proxyBuckets[key] = append(c.proxyBuckets[key], bucket)
+type clientWithCommon struct {
+	baseClient
 }
 
-func NewClient(wargamingAppID string, requestsPerSecond int, opts Options) (Client, error) {
-	if wargamingAppID == "" {
-		return Client{}, errors.New("wargaming application id is required")
+func (c clientWithCommon) RealmFromAccountID(id string) string {
+	intID, _ := strconv.Atoi(id)
+	switch {
+	case intID == 0:
+		return ""
+	case intID < 500000000:
+		return "RU"
+	case intID < 1000000000:
+		return "EU"
+	case intID < 2000000000:
+		return "NA"
+	default:
+		return "AS"
 	}
-	if opts.Timeout == 0 {
-		opts.Timeout = time.Second * 3
-	}
-
-	client := Client{proxyBuckets: make(map[string][]*proxyBucket), options: opts}
-	client.addBucket(bucketKeyWildcard, &proxyBucket{
-		mu:             sync.Mutex{},
-		rps:            requestsPerSecond,
-		wgAppId:        wargamingAppID,
-		limiter:        make(chan int, requestsPerSecond),
-		activeRequests: requestsPerSecond * 100, // Make sure this bucket is never picked
-		proxyUrl:       nil,
-	})
-
-	for key, bucketSlice := range opts.Buckets {
-		for _, b := range bucketSlice {
-			client.addBucket(key, b)
-		}
-	}
-
-	return client, nil
 }
 
-func (c *Client) getBucket(key string) (*proxyBucket, error) {
-	if len(c.proxyBuckets) == 0 {
-		return nil, nil
+func NewEmbeddedClient(primaryWgAppID string, primaryWgAppRPS int, proxyHostList string, requestTimeout time.Duration) (Client, error) {
+	c, err := client.NewClient(primaryWgAppID, primaryWgAppRPS, client.Options{BucketsString: proxyHostList, Timeout: requestTimeout})
+	if err != nil {
+		return nil, err
 	}
+	return clientWithCommon{c}, nil
+}
 
-	buckets, ok := c.proxyBuckets[key]
-	if !ok || len(buckets) == 0 {
-		wildcardBuckets, ok := c.proxyBuckets[bucketKeyWildcard]
-		if !ok {
-			return nil, ErrNoProxyBuckets
-		}
-		buckets = wildcardBuckets
-	}
-	if len(buckets) == 1 {
-		return buckets[0], nil
-	}
-
-	// Pick the bucket with the lowest active requests
-	var lowestRpsBucketIndex int
-	for i := range buckets {
-		if buckets[i].activeRequests < buckets[lowestRpsBucketIndex].activeRequests {
-			lowestRpsBucketIndex = i
-		}
-	}
-
-	return buckets[lowestRpsBucketIndex], nil
+func NewRemoteClient(apiHost string, requestTimeout time.Duration) (Client, error) {
+	return clientWithCommon{api.NewClient(apiHost, requestTimeout)}, nil
 }

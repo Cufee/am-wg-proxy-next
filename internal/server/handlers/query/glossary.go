@@ -10,7 +10,7 @@ import (
 
 func VehicleGlossaryHandler(wg client.Client) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		var response types.ResponseWithError[*types.VehicleDetails]
+		var response types.ResponseWithError[types.VehicleDetails]
 
 		vid := c.Params("id")
 		realm := c.Params("realm")
@@ -20,7 +20,7 @@ func VehicleGlossaryHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetGlossaryVehicle(realm, vid, lang, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.VehicleGlossary(realm, vid, lang, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -42,7 +42,7 @@ func AllVehiclesGlossaryHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetAllGlossaryVehicles(realm, lang, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.CompleteVehicleGlossary(realm, lang, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

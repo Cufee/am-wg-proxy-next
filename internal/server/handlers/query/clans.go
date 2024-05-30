@@ -10,7 +10,7 @@ import (
 
 func AccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		var response types.ResponseWithError[*types.ClanMember]
+		var response types.ResponseWithError[types.ClanMember]
 
 		pid := c.Params("pid")
 		realm := c.Params("realm")
@@ -19,7 +19,7 @@ func AccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetAccountClanInfo(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountClan(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -54,7 +54,7 @@ func SearchClansHandler(wg client.Client) func(c *fiber.Ctx) error {
 
 func ClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		var response types.ResponseWithError[*types.ExtendedClan]
+		var response types.ResponseWithError[types.ExtendedClan]
 
 		cid := c.Params("cid")
 		realm := c.Params("realm")
@@ -63,7 +63,7 @@ func ClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.GetClanInfo(realm, cid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.ClanByID(realm, cid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
