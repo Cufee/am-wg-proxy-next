@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -14,7 +15,7 @@ type glossaryVehicleResponse struct {
 	Data map[string]types.VehicleDetails `json:"data"`
 }
 
-func (c *Client) VehicleGlossary(realm, vehicleID, lang string, fields ...string) (types.VehicleDetails, error) {
+func (c *Client) VehicleGlossary(ctx context.Context, realm, vehicleID, lang string, fields ...string) (types.VehicleDetails, error) {
 	var response glossaryVehicleResponse
 	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
@@ -24,7 +25,7 @@ func (c *Client) VehicleGlossary(realm, vehicleID, lang string, fields ...string
 	query.Set("tank_id", vehicleID)
 	query.Set("language", lang)
 
-	_, err := c.Request(realm, fmt.Sprintf("encyclopedia/vehicles/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("encyclopedia/vehicles/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return types.VehicleDetails{}, err
 	}
@@ -39,7 +40,7 @@ func (c *Client) VehicleGlossary(realm, vehicleID, lang string, fields ...string
 	return info, nil
 }
 
-func (c *Client) CompleteVehicleGlossary(realm, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
+func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
 	var response glossaryVehicleResponse
 	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
@@ -48,7 +49,7 @@ func (c *Client) CompleteVehicleGlossary(realm, lang string, fields ...string) (
 	}
 	query.Set("language", lang)
 
-	_, err := c.Request(realm, fmt.Sprintf("encyclopedia/vehicles/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("encyclopedia/vehicles/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

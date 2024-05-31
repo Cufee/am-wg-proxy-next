@@ -1,13 +1,14 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) SearchAccounts(realm, query string, fields ...string) ([]types.Account, error) {
+func (c *Client) SearchAccounts(ctx context.Context, realm, query string, fields ...string) ([]types.Account, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 	if len(fields) > 0 {
@@ -15,7 +16,7 @@ func (c *Client) SearchAccounts(realm, query string, fields ...string) ([]types.
 	}
 
 	var target []types.Account
-	err := c.sendRequest(realm, accountsSearchEndpoint, &target, opts)
+	err := c.sendRequest(ctx, realm, accountsSearchEndpoint, &target, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -25,18 +26,18 @@ func (c *Client) SearchAccounts(realm, query string, fields ...string) ([]types.
 	return target, nil
 }
 
-func (c *Client) AccountByID(realm string, id string, fields ...string) (types.ExtendedAccount, error) {
+func (c *Client) AccountByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedAccount, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
 	var target types.ExtendedAccount
-	return target, c.sendRequest(realm, accountsGetEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(ctx, realm, accountsGetEndpointFMT.Fmt(id), &target, opts)
 }
 
 // bulk.Get("/accounts/info", query.BulkAccountsInfoHandler)
-func (c *Client) BatchAccountByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
+func (c *Client) BatchAccountByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
 	var target map[string]types.ExtendedAccount
 
 	opts := newDefaultRequestOptions()
@@ -45,21 +46,21 @@ func (c *Client) BatchAccountByID(realm string, ids []string, fields ...string) 
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
-	return target, c.sendRequest(realm, bulkAccountInfoEndpoint, &target, opts)
+	return target, c.sendRequest(ctx, realm, bulkAccountInfoEndpoint, &target, opts)
 }
 
-func (c *Client) AccountClan(realm string, id string, fields ...string) (types.ClanMember, error) {
+func (c *Client) AccountClan(ctx context.Context, realm string, id string, fields ...string) (types.ClanMember, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
 	var target types.ClanMember
-	return target, c.sendRequest(realm, accountClanGetEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(ctx, realm, accountClanGetEndpointFMT.Fmt(id), &target, opts)
 }
 
 // bulk.Get("/accounts/clan", query.BulkAccountClanInfoHandler)
-func (c *Client) BatchAccountClan(realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
+func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
 	var target map[string]types.ClanMember
 
 	opts := newDefaultRequestOptions()
@@ -68,31 +69,31 @@ func (c *Client) BatchAccountClan(realm string, ids []string, fields ...string) 
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
-	return target, c.sendRequest(realm, bulkAccountClanInfoEndpoint, &target, opts)
+	return target, c.sendRequest(ctx, realm, bulkAccountClanInfoEndpoint, &target, opts)
 }
 
-func (c *Client) AccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
+func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
 	var target []types.VehicleStatsFrame
-	return target, c.sendRequest(realm, accountGetVehiclesEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(ctx, realm, accountGetVehiclesEndpointFMT.Fmt(id), &target, opts)
 }
 
-func (c *Client) AccountAchievements(realm string, id string, fields ...string) (types.AchievementsFrame, error) {
+func (c *Client) AccountAchievements(ctx context.Context, realm string, id string, fields ...string) (types.AchievementsFrame, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
 	var target types.AchievementsFrame
-	return target, c.sendRequest(realm, accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(ctx, realm, accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
 }
 
 // bulk.Get("/accounts/achievements", query.BulkAccountsAchievementsHandler)
-func (c *Client) BatchAccountAchievements(realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
+func (c *Client) BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
 	var target map[string]types.AchievementsFrame
 
 	opts := newDefaultRequestOptions()
@@ -101,5 +102,5 @@ func (c *Client) BatchAccountAchievements(realm string, ids []string, fields ...
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
-	return target, c.sendRequest(realm, bulkAccountAchievementsEndpoint, &target, opts)
+	return target, c.sendRequest(ctx, realm, bulkAccountAchievementsEndpoint, &target, opts)
 }

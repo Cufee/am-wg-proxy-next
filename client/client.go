@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"strconv"
 	"time"
 
@@ -10,21 +11,21 @@ import (
 )
 
 type baseClient interface {
-	SearchAccounts(realm, query string, fields ...string) ([]types.Account, error)
-	AccountByID(realm string, id string, fields ...string) (types.ExtendedAccount, error)
-	BatchAccountByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error)
-	AccountClan(realm string, id string, fields ...string) (types.ClanMember, error)
-	BatchAccountClan(realm string, ids []string, fields ...string) (map[string]types.ClanMember, error)
-	AccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error)
-	AccountAchievements(realm string, id string, fields ...string) (types.AchievementsFrame, error)
-	BatchAccountAchievements(realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error)
+	SearchAccounts(ctx context.Context, realm, query string, fields ...string) ([]types.Account, error)
+	AccountByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedAccount, error)
+	BatchAccountByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error)
+	AccountClan(ctx context.Context, realm string, id string, fields ...string) (types.ClanMember, error)
+	BatchAccountClan(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ClanMember, error)
+	AccountVehicles(ctx context.Context, realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error)
+	AccountAchievements(ctx context.Context, realm string, id string, fields ...string) (types.AchievementsFrame, error)
+	BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error)
 
-	SearchClans(realm, query string, fields ...string) ([]types.Clan, error)
-	ClanByID(realm string, id string, fields ...string) (types.ExtendedClan, error)
-	BatchClanByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error)
+	SearchClans(ctx context.Context, realm, query string, fields ...string) ([]types.Clan, error)
+	ClanByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedClan, error)
+	BatchClanByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error)
 
-	VehicleGlossary(realm string, vehicleId string, lang string, fields ...string) (types.VehicleDetails, error)
-	CompleteVehicleGlossary(realm string, lang string, fields ...string) (map[string]types.VehicleDetails, error)
+	VehicleGlossary(ctx context.Context, realm string, vehicleId string, lang string, fields ...string) (types.VehicleDetails, error)
+	CompleteVehicleGlossary(ctx context.Context, realm string, lang string, fields ...string) (map[string]types.VehicleDetails, error)
 }
 
 type Client interface {

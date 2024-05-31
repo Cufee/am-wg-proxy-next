@@ -83,7 +83,7 @@ const (
 	bulkAccountAchievementsEndpoint endpoint = "/bulk/accounts/achievements"
 )
 
-func (c *Client) sendRequest(realm string, path endpoint, target interface{}, optsInput ...requestOptions) error {
+func (c *Client) sendRequest(ctx context.Context, realm string, path endpoint, target interface{}, optsInput ...requestOptions) error {
 	opts := newDefaultRequestOptions()
 	if len(optsInput) > 0 {
 		opts = optsInput[0]
@@ -96,8 +96,13 @@ func (c *Client) sendRequest(realm string, path endpoint, target interface{}, op
 	}
 	urlData.RawQuery = opts.Query.Encode()
 
+	request, err := http.NewRequest("GET", urlData.String(), nil)
+	if err != nil {
+		return err
+	}
+
 	// Send request
-	resp, err := c.httpClient.Get(urlData.String())
+	resp, err := c.httpClient.Do(request.WithContext(ctx))
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || os.IsTimeout(err) {
 			return common.ErrRequestTimeOut

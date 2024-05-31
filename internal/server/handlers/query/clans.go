@@ -19,7 +19,7 @@ func AccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.AccountClan(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountClan(c.Context(), realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -41,7 +41,7 @@ func SearchClansHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.SearchClans(realm, query, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.SearchClans(c.Context(), realm, query, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -63,7 +63,7 @@ func ClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.ClanByID(realm, cid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.ClanByID(c.Context(), realm, cid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

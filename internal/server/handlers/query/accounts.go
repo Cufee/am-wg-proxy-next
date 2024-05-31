@@ -18,7 +18,7 @@ func SearchAccountsHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.SearchAccounts(realm, query, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.SearchAccounts(c.Context(), realm, query, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -40,7 +40,7 @@ func AccountInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.AccountByID(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountByID(c.Context(), realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusNotFound).JSON(response)
@@ -62,7 +62,7 @@ func AccountAchievementsHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.AccountAchievements(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountAchievements(c.Context(), realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -84,7 +84,7 @@ func AccountVehiclesHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.AccountVehicles(realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountVehicles(c.Context(), realm, pid, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

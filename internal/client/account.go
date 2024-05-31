@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -15,7 +16,7 @@ type searchResponse struct {
 	Data []types.Account `json:"data"`
 }
 
-func (c *Client) SearchAccounts(realm, search string, fields ...string) ([]types.Account, error) {
+func (c *Client) SearchAccounts(ctx context.Context, realm, search string, fields ...string) ([]types.Account, error) {
 	var response searchResponse
 	query := url.Values{}
 	if len(fields) > 0 {
@@ -24,7 +25,7 @@ func (c *Client) SearchAccounts(realm, search string, fields ...string) ([]types
 	query.Set("search", search)
 	query.Set("limit", "3")
 
-	_, err := c.Request(realm, fmt.Sprintf("account/list/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("account/list/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +42,8 @@ type infoResponse struct {
 	Data map[string]types.ExtendedAccount `json:"data"`
 }
 
-func (c *Client) AccountByID(realm string, id string, fields ...string) (types.ExtendedAccount, error) {
-	accountsMap, err := c.BatchAccountByID(realm, []string{id}, fields...)
+func (c *Client) AccountByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedAccount, error) {
+	accountsMap, err := c.BatchAccountByID(ctx, realm, []string{id}, fields...)
 	if err != nil {
 		return types.ExtendedAccount{}, err
 	}
@@ -54,7 +55,7 @@ func (c *Client) AccountByID(realm string, id string, fields ...string) (types.E
 	return info, nil
 }
 
-func (c *Client) BatchAccountByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
+func (c *Client) BatchAccountByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
 	var response infoResponse
 	query := url.Values{}
 	if len(fields) > 0 {
@@ -63,7 +64,7 @@ func (c *Client) BatchAccountByID(realm string, ids []string, fields ...string) 
 	query.Set("extra", "statistics.rating")
 	query.Set("account_id", strings.Join(ids, ","))
 
-	_, err := c.Request(realm, fmt.Sprintf("account/info/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("account/info/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +79,8 @@ type accountClanInfoResponse struct {
 	Data map[string]types.ClanMember `json:"data"`
 }
 
-func (c *Client) AccountClan(realm string, playerId string, fields ...string) (types.ClanMember, error) {
-	data, err := c.BatchAccountClan(realm, []string{playerId}, fields...)
+func (c *Client) AccountClan(ctx context.Context, realm string, playerId string, fields ...string) (types.ClanMember, error) {
+	data, err := c.BatchAccountClan(ctx, realm, []string{playerId}, fields...)
 	if err != nil {
 		return types.ClanMember{}, err
 	}
@@ -91,7 +92,7 @@ func (c *Client) AccountClan(realm string, playerId string, fields ...string) (t
 	return types.ClanMember{}, nil
 }
 
-func (c *Client) BatchAccountClan(realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
+func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
 	var response accountClanInfoResponse
 	query := url.Values{}
 	if len(fields) > 0 {
@@ -100,7 +101,7 @@ func (c *Client) BatchAccountClan(realm string, ids []string, fields ...string) 
 	query.Set("extra", "clan")
 	query.Set("account_id", strings.Join(ids, ","))
 
-	_, err := c.Request(realm, fmt.Sprintf("clans/accountinfo/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("clans/accountinfo/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +122,7 @@ type vehiclesResponse struct {
 // 	Data map[string]types.AchievementsFrame `json:"data"`
 // }
 
-func (c *Client) AccountVehicles(realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
+func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
 	var response vehiclesResponse
 	query := url.Values{}
 	if len(fields) > 0 {
@@ -129,7 +130,7 @@ func (c *Client) AccountVehicles(realm string, id string, fields ...string) ([]t
 	}
 	query.Set("account_id", id)
 
-	_, err := c.Request(realm, fmt.Sprintf("tanks/stats/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("tanks/stats/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -151,9 +152,9 @@ type achievementsResponse struct {
 	} `json:"data"`
 }
 
-func (c *Client) AccountAchievements(realm string, id string, fields ...string) (types.AchievementsFrame, error) {
+func (c *Client) AccountAchievements(ctx context.Context, realm string, id string, fields ...string) (types.AchievementsFrame, error) {
 
-	achievementsMap, err := c.BatchAccountAchievements(realm, []string{id}, fields...)
+	achievementsMap, err := c.BatchAccountAchievements(ctx, realm, []string{id}, fields...)
 	if err != nil {
 		return types.AchievementsFrame{}, errors.Wrap(err, "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
@@ -165,7 +166,7 @@ func (c *Client) AccountAchievements(realm string, id string, fields ...string) 
 	return info, nil
 }
 
-func (c *Client) BatchAccountAchievements(realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
+func (c *Client) BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
 	var response achievementsResponse
 	query := url.Values{}
 	query.Set("fields", "achievements")
@@ -174,7 +175,7 @@ func (c *Client) BatchAccountAchievements(realm string, ids []string, fields ...
 	}
 	query.Set("account_id", strings.Join(ids, ","))
 
-	_, err := c.Request(realm, fmt.Sprintf("account/achievements/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("account/achievements/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetBulkAccountsAchievements > client.WargamingRequest")
 	}

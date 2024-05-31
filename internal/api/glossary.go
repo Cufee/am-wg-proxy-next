@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
@@ -13,7 +14,7 @@ import (
 // glossary.Get("/achievements", dummyHandlerFunc)
 // glossary.Get("/vehicles/:vid", query.VehicleGlossaryHandler)
 
-func (c *Client) VehicleGlossary(realm string, vehicleId string, lang string, fields ...string) (types.VehicleDetails, error) {
+func (c *Client) VehicleGlossary(ctx context.Context, realm string, vehicleId string, lang string, fields ...string) (types.VehicleDetails, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", vehicleId)
 	opts.Query.Add("language", types.GetLocale(lang))
@@ -22,11 +23,11 @@ func (c *Client) VehicleGlossary(realm string, vehicleId string, lang string, fi
 	}
 
 	var target types.VehicleDetails
-	return target, c.sendRequest(realm, glossaryManyVehiclesEndpoint, &target, opts)
+	return target, c.sendRequest(ctx, realm, glossaryManyVehiclesEndpoint, &target, opts)
 }
 
 // glossary.Get("/vehicles", query.AllVehiclesGlossaryHandler)
-func (c *Client) CompleteVehicleGlossary(realm string, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
+func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm string, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("language", types.GetLocale(lang))
 	if len(fields) > 0 {
@@ -34,5 +35,5 @@ func (c *Client) CompleteVehicleGlossary(realm string, lang string, fields ...st
 	}
 
 	var target map[string]types.VehicleDetails
-	return target, c.sendRequest(realm, glossaryManyVehiclesEndpoint, &target, opts)
+	return target, c.sendRequest(ctx, realm, glossaryManyVehiclesEndpoint, &target, opts)
 }

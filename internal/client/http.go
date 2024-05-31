@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -15,7 +16,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func (c *Client) Request(realm, path, method string, payload []byte, target interface{}) (int, error) {
+func (c *Client) Request(ctx context.Context, realm, path, method string, payload []byte, target interface{}) (int, error) {
 	bkt, err := c.getBucket(realm)
 	if err != nil {
 		return 0, err
@@ -45,7 +46,7 @@ func (c *Client) Request(realm, path, method string, payload []byte, target inte
 		headers["Proxy-Authorization"] = bkt.authHeader
 	}
 
-	return httpRequest(endpoint.String(), method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
+	return httpRequest(ctx, endpoint.String(), method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
 }
 
 func baseUriFromRealm(realm string) (string, error) {
@@ -61,7 +62,7 @@ func baseUriFromRealm(realm string) (string, error) {
 	}
 }
 
-func httpRequest(url, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
+func httpRequest(ctx context.Context, url, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
 	var err error
 	var bodyBytes []byte
 	var resp *http.Response
@@ -111,7 +112,7 @@ func httpRequest(url, method string, proxy *url.URL, headers map[string]string, 
 		Transport: transport,
 	}
 	defer client.CloseIdleConnections()
-	resp, err = client.Do(req)
+	resp, err = client.Do(req.WithContext(ctx))
 	if err != nil {
 		return 0, err
 	}

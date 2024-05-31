@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -14,7 +15,7 @@ type clanSearchResponse struct {
 	Data []types.Clan `json:"data"`
 }
 
-func (c *Client) SearchClans(realm, search string, fields ...string) ([]types.Clan, error) {
+func (c *Client) SearchClans(ctx context.Context, realm, search string, fields ...string) ([]types.Clan, error) {
 	var response clanSearchResponse
 	query := url.Values{}
 	if len(fields) > 0 {
@@ -23,7 +24,7 @@ func (c *Client) SearchClans(realm, search string, fields ...string) ([]types.Cl
 	query.Set("search", search)
 	query.Set("limit", "3")
 
-	_, err := c.Request(realm, fmt.Sprintf("clans/list/?%v", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("clans/list/?%v", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +39,8 @@ type clanInfoResponse struct {
 	Data map[string]types.ExtendedClan `json:"data"`
 }
 
-func (c *Client) ClanByID(realm string, clanId string, fields ...string) (types.ExtendedClan, error) {
-	data, err := c.BatchClanByID(realm, []string{clanId}, fields...)
+func (c *Client) ClanByID(ctx context.Context, realm string, clanId string, fields ...string) (types.ExtendedClan, error) {
+	data, err := c.BatchClanByID(ctx, realm, []string{clanId}, fields...)
 	if err != nil {
 		return types.ExtendedClan{}, err
 	}
@@ -51,7 +52,7 @@ func (c *Client) ClanByID(realm string, clanId string, fields ...string) (types.
 	return info, nil
 }
 
-func (c *Client) BatchClanByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
+func (c *Client) BatchClanByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
 	var response clanInfoResponse
 	query := url.Values{}
 	if len(fields) > 0 {
@@ -59,7 +60,7 @@ func (c *Client) BatchClanByID(realm string, ids []string, fields ...string) (ma
 	}
 	query.Set("clan_id", strings.Join(ids, ","))
 
-	_, err := c.Request(realm, fmt.Sprintf("clans/info/?%s", query.Encode()), "GET", nil, &response)
+	_, err := c.Request(ctx, realm, fmt.Sprintf("clans/info/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
 		return nil, err
 	}

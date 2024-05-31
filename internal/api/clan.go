@@ -1,24 +1,25 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) ClanByID(realm string, id string, fields ...string) (types.ExtendedClan, error) {
+func (c *Client) ClanByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedClan, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
 	var target types.ExtendedClan
-	return target, c.sendRequest(realm, clansGetEndpointFMT.Fmt(id), &target, opts)
+	return target, c.sendRequest(ctx, realm, clansGetEndpointFMT.Fmt(id), &target, opts)
 }
 
 // bulk.Get("/clans/info", query.BulkAccountsInfoHandler)
-func (c *Client) BatchClanByID(realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
+func (c *Client) BatchClanByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
 	var target map[string]types.ExtendedClan
 
 	opts := newDefaultRequestOptions()
@@ -27,10 +28,10 @@ func (c *Client) BatchClanByID(realm string, ids []string, fields ...string) (ma
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
 
-	return target, c.sendRequest(realm, bulkAccountInfoEndpoint, &target, opts)
+	return target, c.sendRequest(ctx, realm, bulkAccountInfoEndpoint, &target, opts)
 }
 
-func (c *Client) SearchClans(realm, query string, fields ...string) ([]types.Clan, error) {
+func (c *Client) SearchClans(ctx context.Context, realm, query string, fields ...string) ([]types.Clan, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 	if len(fields) > 0 {
@@ -38,7 +39,7 @@ func (c *Client) SearchClans(realm, query string, fields ...string) ([]types.Cla
 	}
 
 	var target []types.Clan
-	err := c.sendRequest(realm, clansSearchEndpoint, &target, opts)
+	err := c.sendRequest(ctx, realm, clansSearchEndpoint, &target, opts)
 	if err != nil {
 		return nil, err
 	}
