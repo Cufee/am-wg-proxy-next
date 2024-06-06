@@ -82,7 +82,7 @@ func httpRequest(ctx context.Context, url, method string, proxy *url.URL, header
 		if payload != nil {
 			event.Str("payload", string(payload))
 		}
-		event.Msg("request failed")
+		event.Msg("request")
 	}()
 
 	// Prep request
