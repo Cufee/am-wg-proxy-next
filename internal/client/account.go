@@ -89,7 +89,7 @@ func (c *Client) AccountClan(ctx context.Context, realm string, playerId string,
 	if !ok || info.ClanID == 0 {
 		return types.ClanMember{}, errors.New("clan not found")
 	}
-	return types.ClanMember{}, nil
+	return info, nil
 }
 
 func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
