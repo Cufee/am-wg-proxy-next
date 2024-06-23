@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"golang.org/x/sync/semaphore"
 )
 
 func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (*proxyBucket, error) {
@@ -40,7 +42,7 @@ func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (
 	}
 
 	bucketSettings.mu = sync.Mutex{}
-	bucketSettings.limiter = make(chan int, bucketSettings.rps)
+	bucketSettings.limiter = semaphore.NewWeighted(int64(bucketSettings.rps))
 
 	bucketSettings.proxyUrl = buildProxyURL(bucketSettings.host, bucketSettings.port, bucketSettings.username, bucketSettings.password)
 	bucketSettings.authHeader = "Basic " + base64.StdEncoding.EncodeToString([]byte(bucketSettings.username+":"+bucketSettings.password))

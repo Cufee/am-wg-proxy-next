@@ -1,11 +1,13 @@
 package client
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"sync"
 
 	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/semaphore"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -24,24 +26,25 @@ type proxyBucket struct {
 	wgAppId string
 
 	mu             sync.Mutex
-	limiter        chan int
+	limiter        *semaphore.Weighted
 	activeRequests int
 
 	proxyUrl   *url.URL
 	authHeader string
 }
 
-func (b *proxyBucket) waitForTick() {
+func (b *proxyBucket) waitForTick(ctx context.Context) error {
 	log.Debug().Str("realm", b.realm).Msg("Waiting for tick")
 
 	b.mu.Lock()
 	b.activeRequests++
 	b.mu.Unlock()
-	b.limiter <- 1
+
+	return b.limiter.Acquire(ctx, 1)
 }
 
 func (b *proxyBucket) onComplete() {
-	<-b.limiter
+	b.limiter.Release(1)
 
 	b.mu.Lock()
 	b.activeRequests--

@@ -22,7 +22,10 @@ func (c *Client) Request(ctx context.Context, realm, path, method string, payloa
 		return 0, err
 	}
 
-	bkt.waitForTick()
+	err = bkt.waitForTick(ctx)
+	if err != nil {
+		return 0, err
+	}
 	defer bkt.onComplete()
 
 	baseUri, err := baseUriFromRealm(realm)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
+	"golang.org/x/sync/semaphore"
 )
 
 type Options struct {
@@ -38,7 +39,7 @@ func NewClient(wargamingAppID string, requestsPerSecond int, opts Options) (*Cli
 		mu:             sync.Mutex{},
 		rps:            requestsPerSecond,
 		wgAppId:        wargamingAppID,
-		limiter:        make(chan int, requestsPerSecond),
+		limiter:        semaphore.NewWeighted(int64(requestsPerSecond)),
 		activeRequests: requestsPerSecond * 100, // Make sure this bucket is never picked
 		proxyUrl:       nil,
 	})
