@@ -73,16 +73,12 @@ func httpRequest(ctx context.Context, url, method string, proxy *url.URL, header
 			event.Err(err)
 		}
 		if proxy != nil {
-			event.Str("proxy", proxy.String())
+			event.Str("proxy", proxy.Host)
 		}
 		if resp != nil {
 			event.Int("status code", resp.StatusCode)
-			event.Str("response", string(bodyBytes))
 		}
-		if payload != nil {
-			event.Str("payload", string(payload))
-		}
-		event.Msg("request")
+		event.Msg("wg api request")
 	}()
 
 	// Prep request
