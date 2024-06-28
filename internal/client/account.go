@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
@@ -164,6 +165,43 @@ func (c *Client) AccountAchievements(ctx context.Context, realm string, id strin
 		return types.AchievementsFrame{}, errors.Wrap(errors.New("account not found"), "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
 	return info, nil
+}
+
+type vehicleAchievementsResponse struct {
+	types.WgResponse
+	Data map[string][]struct {
+		Achievements types.AchievementsFrame `json:"achievements"`
+		AccountID    int                     `json:"account_id"`
+		TankID       int                     `json:"tank_id"`
+	} `json:"data"`
+}
+
+func (c *Client) AccountVehicleAchievements(ctx context.Context, realm string, id string, fields ...string) (map[string]types.AchievementsFrame, error) {
+	var response vehicleAchievementsResponse
+	query := url.Values{}
+	if len(fields) > 0 {
+		query.Set("fields", strings.Join(fields, ","))
+	}
+	query.Set("account_id", id)
+
+	_, err := c.Request(ctx, realm, fmt.Sprintf("tanks/achievements/?%s", query.Encode()), "GET", nil, &response)
+	if err != nil {
+		return nil, err
+	}
+	if response.Error.Code != 0 {
+		return nil, errors.New(response.Error.Message)
+	}
+
+	vehicles, ok := response.Data[id]
+	if !ok {
+		return nil, errors.New("account not found")
+	}
+
+	achievements := make(map[string]types.AchievementsFrame)
+	for _, vehicle := range vehicles {
+		achievements[strconv.Itoa(vehicle.TankID)] = vehicle.Achievements
+	}
+	return achievements, nil
 }
 
 func (c *Client) BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {

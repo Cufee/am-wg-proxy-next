@@ -92,6 +92,16 @@ func (c *Client) AccountAchievements(ctx context.Context, realm string, id strin
 	return target, c.sendRequest(ctx, realm, accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
 }
 
+func (c *Client) AccountVehicleAchievements(ctx context.Context, realm string, id string, fields ...string) (map[string]types.AchievementsFrame, error) {
+	opts := newDefaultRequestOptions()
+	if len(fields) > 0 {
+		opts.Query.Add("fields", strings.Join(fields, ","))
+	}
+
+	var target map[string]types.AchievementsFrame
+	return target, c.sendRequest(ctx, realm, accountGetVehicleAchievementsEndpointFMT.Fmt(id), &target, opts)
+}
+
 // bulk.Get("/accounts/achievements", query.BulkAccountsAchievementsHandler)
 func (c *Client) BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
 	var target map[string]types.AchievementsFrame

@@ -43,6 +43,7 @@ func Listen(wgClient client.Client, opts Options, middleware ...func(c *fiber.Ct
 	accounts := queryPath.Group("/accounts")
 	accounts.Get("/search", query.SearchAccountsHandler(wgClient))
 	accounts.Get("/:pid/achievements", query.AccountAchievementsHandler(wgClient))
+	accounts.Get("/:pid/vehicles/achievements", query.AccountVehicleAchievementsHandler(wgClient))
 	accounts.Get("/:pid/vehicles", query.AccountVehiclesHandler(wgClient))
 	accounts.Get("/:pid/clan", query.AccountClanInfoHandler(wgClient))
 	accounts.Get("/:pid", query.AccountInfoHandler(wgClient))

@@ -63,11 +63,12 @@ func (e endpoint) Fmt(args ...interface{}) endpoint {
 }
 
 const (
-	accountsSearchEndpoint            endpoint = "/accounts/search"
-	accountsGetEndpointFMT            endpoint = "/accounts/%v"
-	accountClanGetEndpointFMT         endpoint = "/accounts/%v/clan"
-	accountGetVehiclesEndpointFMT     endpoint = "/accounts/%v/vehicles"
-	accountGetAchievementsEndpointFMT endpoint = "/accounts/%v/achievements"
+	accountsSearchEndpoint                   endpoint = "/accounts/search"
+	accountsGetEndpointFMT                   endpoint = "/accounts/%v"
+	accountClanGetEndpointFMT                endpoint = "/accounts/%v/clan"
+	accountGetVehiclesEndpointFMT            endpoint = "/accounts/%v/vehicles"
+	accountGetAchievementsEndpointFMT        endpoint = "/accounts/%v/achievements"
+	accountGetVehicleAchievementsEndpointFMT endpoint = "/accounts/%v/vehicles/achievements"
 
 	clansSearchEndpoint endpoint = "/clans/search"
 	clansGetEndpointFMT endpoint = "/clans/%v"
