@@ -6,6 +6,7 @@ import (
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/rs/zerolog"
 )
 
 type Options struct {
@@ -16,6 +17,7 @@ type Options struct {
 type Client struct {
 	proxyBuckets map[string][]*proxyBucket
 	options      Options
+	logger       zerolog.Logger
 }
 
 func (c *Client) addBucket(key string, bucket *proxyBucket) {
@@ -25,7 +27,7 @@ func (c *Client) addBucket(key string, bucket *proxyBucket) {
 	c.proxyBuckets[key] = append(c.proxyBuckets[key], bucket)
 }
 
-func NewClient(wargamingAppID string, requestsPerSecond int, opts Options) (*Client, error) {
+func NewClient(logger zerolog.Logger, wargamingAppID string, requestsPerSecond int, opts Options) (*Client, error) {
 	if wargamingAppID == "" {
 		return nil, errors.New("wargaming application id is required")
 	}

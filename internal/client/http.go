@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
-	"io"
+
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -46,7 +46,7 @@ func (c *Client) Request(ctx context.Context, realm, path, method string, payloa
 		headers["Proxy-Authorization"] = bkt.authHeader
 	}
 
-	return httpRequest(ctx, endpoint.String(), method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
+	return httpRequest(ctx, endpoint, method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
 }
 
 func baseUriFromRealm(realm string) (string, error) {
@@ -62,27 +62,17 @@ func baseUriFromRealm(realm string) (string, error) {
 	}
 }
 
-func httpRequest(ctx context.Context, url, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
-	var err error
-	var bodyBytes []byte
-	var resp *http.Response
-
+func httpRequest(ctx context.Context, url *url.URL, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
+	event := log.Debug().Str("path", url.Path).Str("method", method)
+	if proxy != nil {
+		event.Str("proxy", proxy.Host)
+	}
 	defer func() {
-		event := log.Debug().Str("url", url).Str("method", method)
-		if err != nil {
-			event.Err(err)
-		}
-		if proxy != nil {
-			event.Str("proxy", proxy.Host)
-		}
-		if resp != nil {
-			event.Int("status code", resp.StatusCode)
-		}
 		event.Msg("wg api request")
 	}()
 
 	// Prep request
-	req, err := http.NewRequest(strings.ToUpper(method), url, bytes.NewBuffer(payload))
+	req, err := http.NewRequest(strings.ToUpper(method), url.String(), bytes.NewBuffer(payload))
 	if err != nil {
 		return 0, err
 	}
@@ -108,22 +98,20 @@ func httpRequest(ctx context.Context, url, method string, proxy *url.URL, header
 		Transport: transport,
 	}
 	defer client.CloseIdleConnections()
-	resp, err = client.Do(req.WithContext(ctx))
+	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
+		event.Err(errors.Wrap(err, "client#Do failed"))
 		return 0, err
+	}
+	if resp != nil {
+		event.Int("status code", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 
 	if target != nil {
-		// Read body
-		bodyBytes, err = io.ReadAll(resp.Body)
+		err := json.NewDecoder(resp.Body).Decode(target)
 		if err != nil {
-			return resp.StatusCode, err
-		}
-
-		// Decode
-		err = json.Unmarshal(bodyBytes, target)
-		if err != nil {
+			event.Err(errors.Wrap(err, "json#Decode failed"))
 			return resp.StatusCode, err
 		}
 	}

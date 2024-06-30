@@ -15,29 +15,21 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 )
 
 type Client struct {
 	debug      bool
 	httpClient *http.Client
 	host       string
+	logger     zerolog.Logger
 }
 
-type ClientOptions struct {
-	Debug bool
-}
-
-func NewClient(host string, timeout time.Duration, opts ...ClientOptions) *Client {
-	var debug bool
-	if len(opts) > 0 {
-		debug = opts[0].Debug
-	}
-
+func NewClient(logger zerolog.Logger, host string, timeout time.Duration) *Client {
 	return &Client{
 		httpClient: &http.Client{Timeout: timeout},
 		host:       host,
-		debug:      debug,
+		logger:     logger,
 	}
 }
 
@@ -113,7 +105,7 @@ func (c *Client) sendRequest(ctx context.Context, realm string, path endpoint, t
 	defer resp.Body.Close()
 
 	if c.debug {
-		log.Debug().Str("url", urlData.String()).Msgf("Got response with status %v", resp.StatusCode)
+		c.logger.Debug().Str("url", urlData.String()).Msgf("Got response with status %v", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -124,7 +116,7 @@ func (c *Client) sendRequest(ctx context.Context, realm string, path endpoint, t
 	// Header and status checks
 	if resp.Header.Get("Content-Type") != "application/json" {
 		if c.debug {
-			log.Debug().Str("url", urlData.String()).Msgf("Response is not JSON. Response body: %s", string(body))
+			c.logger.Debug().Str("url", urlData.String()).Msgf("Response is not JSON. Response body: %s", string(body))
 		}
 		return common.ErrUnexpectedContentType
 	}

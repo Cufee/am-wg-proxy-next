@@ -2,12 +2,14 @@ package client
 
 import (
 	"context"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/cufee/am-wg-proxy-next/v2/internal/api"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/client"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
+	"github.com/rs/zerolog"
 )
 
 type baseClient interface {
@@ -54,14 +56,38 @@ func (c clientWithCommon) RealmFromAccountID(id string) string {
 	}
 }
 
-func NewEmbeddedClient(primaryWgAppID string, primaryWgAppRPS int, proxyHostList string, requestTimeout time.Duration) (Client, error) {
-	c, err := client.NewClient(primaryWgAppID, primaryWgAppRPS, client.Options{BucketsString: proxyHostList, Timeout: requestTimeout})
+type clientOptions struct {
+	logLevel zerolog.Level
+}
+
+var defaultOptions = clientOptions{logLevel: zerolog.InfoLevel}
+
+type ClientOption func(*clientOptions)
+
+func WithLogLevel(level zerolog.Level) ClientOption {
+	return func(co *clientOptions) { co.logLevel = level }
+}
+
+func NewEmbeddedClient(primaryWgAppID string, primaryWgAppRPS int, proxyHostList string, requestTimeout time.Duration, opts ...ClientOption) (Client, error) {
+	options := defaultOptions
+	for _, apply := range opts {
+		apply(&defaultOptions)
+	}
+	logger := zerolog.New(os.Stderr).With().Timestamp().Logger().Level(options.logLevel)
+
+	c, err := client.NewClient(logger, primaryWgAppID, primaryWgAppRPS, client.Options{BucketsString: proxyHostList, Timeout: requestTimeout})
 	if err != nil {
 		return nil, err
 	}
 	return clientWithCommon{c}, nil
 }
 
-func NewRemoteClient(apiHost string, requestTimeout time.Duration) (Client, error) {
-	return clientWithCommon{api.NewClient(apiHost, requestTimeout)}, nil
+func NewRemoteClient(apiHost string, requestTimeout time.Duration, opts ...ClientOption) (Client, error) {
+	options := defaultOptions
+	for _, apply := range opts {
+		apply(&defaultOptions)
+	}
+	logger := zerolog.New(os.Stderr).With().Timestamp().Logger().Level(options.logLevel)
+
+	return clientWithCommon{api.NewClient(logger, apiHost, requestTimeout)}, nil
 }
