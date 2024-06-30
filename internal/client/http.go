@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -22,8 +21,8 @@ func (c *Client) Request(ctx context.Context, realm, path, method string, payloa
 		return 0, err
 	}
 
-	bkt.waitForTick()
-	defer bkt.onComplete()
+	bkt.waitForTick(c.logger)
+	defer bkt.onComplete(c.logger)
 
 	baseUri, err := baseUriFromRealm(realm)
 	if err != nil {
@@ -39,14 +38,14 @@ func (c *Client) Request(ctx context.Context, realm, path, method string, payloa
 	query.Set("application_id", bkt.wgAppId)
 	endpoint.RawQuery = query.Encode()
 
-	log.Debug().Str("realm", realm).Str("endpoint", endpoint.String()).Msg("Sending request")
+	c.logger.Debug().Str("realm", realm).Str("endpoint", endpoint.String()).Msg("Sending request")
 
 	headers := make(map[string]string)
 	if bkt.proxyUrl != nil {
 		headers["Proxy-Authorization"] = bkt.authHeader
 	}
 
-	return httpRequest(ctx, endpoint, method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
+	return c.httpRequest(ctx, endpoint, method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
 }
 
 func baseUriFromRealm(realm string) (string, error) {
@@ -62,8 +61,8 @@ func baseUriFromRealm(realm string) (string, error) {
 	}
 }
 
-func httpRequest(ctx context.Context, url *url.URL, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
-	event := log.Debug().Str("path", url.Path).Str("method", method)
+func (c *Client) httpRequest(ctx context.Context, url *url.URL, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
+	event := c.logger.Debug().Str("path", url.Path).Str("method", method)
 	if proxy != nil {
 		event.Str("proxy", proxy.Host)
 	}

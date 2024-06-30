@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -31,8 +31,8 @@ type proxyBucket struct {
 	authHeader string
 }
 
-func (b *proxyBucket) waitForTick() {
-	log.Debug().Str("realm", b.realm).Msg("Waiting for tick")
+func (b *proxyBucket) waitForTick(logger zerolog.Logger) {
+	logger.Debug().Str("realm", b.realm).Msg("Waiting for tick")
 
 	b.mu.Lock()
 	b.activeRequests++
@@ -40,12 +40,12 @@ func (b *proxyBucket) waitForTick() {
 	b.limiter <- 1
 }
 
-func (b *proxyBucket) onComplete() {
+func (b *proxyBucket) onComplete(logger zerolog.Logger) {
 	<-b.limiter
 
 	b.mu.Lock()
 	b.activeRequests--
 	b.mu.Unlock()
 
-	log.Debug().Str("realm", b.realm).Msg("Completed request")
+	logger.Debug().Str("realm", b.realm).Msg("Completed request")
 }

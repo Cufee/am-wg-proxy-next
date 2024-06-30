@@ -19,7 +19,6 @@ import (
 )
 
 type Client struct {
-	debug      bool
 	httpClient *http.Client
 	host       string
 	logger     zerolog.Logger
@@ -104,9 +103,7 @@ func (c *Client) sendRequest(ctx context.Context, realm string, path endpoint, t
 	}
 	defer resp.Body.Close()
 
-	if c.debug {
-		c.logger.Debug().Str("url", urlData.String()).Msgf("Got response with status %v", resp.StatusCode)
-	}
+	c.logger.Debug().Str("url", urlData.String()).Msgf("Got response with status %v", resp.StatusCode)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -115,9 +112,7 @@ func (c *Client) sendRequest(ctx context.Context, realm string, path endpoint, t
 
 	// Header and status checks
 	if resp.Header.Get("Content-Type") != "application/json" {
-		if c.debug {
-			c.logger.Debug().Str("url", urlData.String()).Msgf("Response is not JSON. Response body: %s", string(body))
-		}
+		c.logger.Debug().Str("url", urlData.String()).Msgf("Response is not JSON. Response body: %s", string(body))
 		return common.ErrUnexpectedContentType
 	}
 

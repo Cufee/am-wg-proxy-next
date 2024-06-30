@@ -9,7 +9,6 @@ import (
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
 type searchResponse struct {
@@ -31,7 +30,7 @@ func (c *Client) SearchAccounts(ctx context.Context, realm, search string, field
 		return nil, err
 	}
 	if response.Error.Code != 0 {
-		log.Error().Str("realm", realm).Str("query", search).Msg("Error while searching accounts")
+		c.logger.Error().Str("realm", realm).Str("query", search).Msg("Error while searching accounts")
 		return nil, errors.New(response.Error.Message)
 	}
 
