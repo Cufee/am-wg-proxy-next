@@ -122,13 +122,16 @@ type vehiclesResponse struct {
 // 	Data map[string]types.AchievementsFrame `json:"data"`
 // }
 
-func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
+func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, vehicles []string, fields ...string) ([]types.VehicleStatsFrame, error) {
 	var response vehiclesResponse
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}
 	query.Set("account_id", id)
+	if len(vehicles) > 0 {
+		query.Set("tank_id", strings.Join(vehicles, ","))
+	}
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("tanks/stats/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
@@ -140,7 +143,7 @@ func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, f
 
 	info, ok := response.Data[id]
 	if !ok {
-		return info, errors.New("account not found")
+		return nil, errors.New("account not found")
 	}
 	return info, nil
 }

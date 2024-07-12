@@ -106,7 +106,7 @@ func AccountVehiclesHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.AccountVehicles(c.Context(), realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.AccountVehicles(c.Context(), realm, pid, strings.Split(c.Query("vehicles", ""), ","), strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

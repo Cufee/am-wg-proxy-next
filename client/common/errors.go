@@ -8,4 +8,6 @@ var (
 	ErrSourceNotAvailable     = errors.New("source not available")
 	ErrBadResponseCode        = errors.New("bad response status code")
 	ErrRequestTimeOut         = errors.New("request timed out")
+
+	ErrNoStatsForVehicle = errors.New("vehicle has no stats")
 )

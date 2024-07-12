@@ -72,10 +72,13 @@ func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []strin
 	return target, c.sendRequest(ctx, realm, bulkAccountClanInfoEndpoint, &target, opts)
 }
 
-func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error) {
+func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, vehicles []string, fields ...string) ([]types.VehicleStatsFrame, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
+	}
+	if len(vehicles) > 0 {
+		opts.Query.Add("vehicles", strings.Join(vehicles, ","))
 	}
 
 	var target []types.VehicleStatsFrame

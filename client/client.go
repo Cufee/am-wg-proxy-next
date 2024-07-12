@@ -18,7 +18,7 @@ type baseClient interface {
 	BatchAccountByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error)
 	AccountClan(ctx context.Context, realm string, id string, fields ...string) (types.ClanMember, error)
 	BatchAccountClan(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ClanMember, error)
-	AccountVehicles(ctx context.Context, realm string, id string, fields ...string) ([]types.VehicleStatsFrame, error)
+	AccountVehicles(ctx context.Context, realm string, id string, vehicles []string, fields ...string) ([]types.VehicleStatsFrame, error)
 	AccountAchievements(ctx context.Context, realm string, id string, fields ...string) (types.AchievementsFrame, error)
 	AccountVehicleAchievements(ctx context.Context, realm string, id string, fields ...string) (map[string]types.AchievementsFrame, error)
 	BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error)
