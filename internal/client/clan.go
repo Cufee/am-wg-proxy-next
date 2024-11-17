@@ -15,14 +15,14 @@ type clanSearchResponse struct {
 	Data []types.Clan `json:"data"`
 }
 
-func (c *Client) SearchClans(ctx context.Context, realm, search string, fields ...string) ([]types.Clan, error) {
+func (c *Client) SearchClans(ctx context.Context, realm, search string, limit int, fields ...string) ([]types.Clan, error) {
 	var response clanSearchResponse
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}
 	query.Set("search", search)
-	query.Set("limit", "3")
+	query.Set("limit", fmt.Sprint(limit))
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("clans/list/?%v", query.Encode()), "GET", nil, &response)
 	if err != nil {

@@ -14,7 +14,7 @@ func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (
 
 	// some kind of valid protocol is required for url.Parse
 	if !strings.Contains(input, "://") {
-		input = "proxy://" + input
+		input = "http://" + input
 	}
 	// user:password@host:port?wgAppId=your_app_id&maxRps=20?realm=na
 	parsed, err := url.Parse(input)
@@ -70,8 +70,9 @@ func ParseProxyString(input string, fallbackWgAppID string, fallbackRps int) map
 		}
 		if bucketSettings.realm == "" {
 			proxyBuckets["*"] = append(proxyBuckets["*"], bucketSettings)
+		} else {
+			proxyBuckets[bucketSettings.realm] = append(proxyBuckets[bucketSettings.realm], bucketSettings)
 		}
-		proxyBuckets[bucketSettings.realm] = append(proxyBuckets[bucketSettings.realm], bucketSettings)
 	}
 
 	return proxyBuckets

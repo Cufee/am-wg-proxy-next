@@ -3,17 +3,19 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) SearchAccounts(ctx context.Context, realm, query string, fields ...string) ([]types.Account, error) {
+func (c *Client) SearchAccounts(ctx context.Context, realm, query string, limit int, fields ...string) ([]types.Account, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
+	opts.Query.Set("limit", fmt.Sprint(limit))
 
 	var target []types.Account
 	err := c.sendRequest(ctx, realm, accountsSearchEndpoint, &target, opts)

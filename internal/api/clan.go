@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
@@ -31,12 +32,13 @@ func (c *Client) BatchClanByID(ctx context.Context, realm string, ids []string, 
 	return target, c.sendRequest(ctx, realm, bulkAccountInfoEndpoint, &target, opts)
 }
 
-func (c *Client) SearchClans(ctx context.Context, realm, query string, fields ...string) ([]types.Clan, error) {
+func (c *Client) SearchClans(ctx context.Context, realm, query string, limit int, fields ...string) ([]types.Clan, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
 	}
+	opts.Query.Set("limit", fmt.Sprint(limit))
 
 	var target []types.Clan
 	err := c.sendRequest(ctx, realm, clansSearchEndpoint, &target, opts)

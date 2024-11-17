@@ -13,7 +13,7 @@ import (
 )
 
 type baseClient interface {
-	SearchAccounts(ctx context.Context, realm, query string, fields ...string) ([]types.Account, error)
+	SearchAccounts(ctx context.Context, realm, query string, limit int, fields ...string) ([]types.Account, error)
 	AccountByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedAccount, error)
 	BatchAccountByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error)
 	AccountClan(ctx context.Context, realm string, id string, fields ...string) (types.ClanMember, error)
@@ -23,7 +23,7 @@ type baseClient interface {
 	AccountVehicleAchievements(ctx context.Context, realm string, id string, fields ...string) (map[string]types.AchievementsFrame, error)
 	BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error)
 
-	SearchClans(ctx context.Context, realm, query string, fields ...string) ([]types.Clan, error)
+	SearchClans(ctx context.Context, realm, query string, limit int, fields ...string) ([]types.Clan, error)
 	ClanByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedClan, error)
 	BatchClanByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error)
 

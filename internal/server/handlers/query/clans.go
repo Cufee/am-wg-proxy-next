@@ -1,6 +1,7 @@
 package query
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/client"
@@ -40,8 +41,12 @@ func SearchClansHandler(wg client.Client) func(c *fiber.Ctx) error {
 			response.Error.Message = "query and realm are required"
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
+		var limit = 3
+		if l, err := strconv.Atoi(c.Query("limit", "3")); err == nil && l > 1 {
+			limit = l
+		}
 
-		result, err := wg.SearchClans(c.Context(), realm, query, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.SearchClans(c.Context(), realm, query, limit, strings.Split(c.Query("fields", ""), ",")...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

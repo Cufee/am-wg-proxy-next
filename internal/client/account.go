@@ -16,14 +16,14 @@ type searchResponse struct {
 	Data []types.Account `json:"data"`
 }
 
-func (c *Client) SearchAccounts(ctx context.Context, realm, search string, fields ...string) ([]types.Account, error) {
+func (c *Client) SearchAccounts(ctx context.Context, realm, search string, limit int, fields ...string) ([]types.Account, error) {
 	var response searchResponse
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
 	}
 	query.Set("search", search)
-	query.Set("limit", "3")
+	query.Set("limit", fmt.Sprint(limit))
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("account/list/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
