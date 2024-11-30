@@ -10,13 +10,8 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-type glossaryVehicleResponse struct {
-	types.WgResponse
-	Data map[string]types.VehicleDetails `json:"data"`
-}
-
 func (c *Client) VehicleGlossary(ctx context.Context, realm, vehicleID, lang string, fields ...string) (types.VehicleDetails, error) {
-	var response glossaryVehicleResponse
+	var response types.WgResponse[map[string]types.VehicleDetails]
 	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
 	if len(fields) > 0 {
@@ -41,7 +36,7 @@ func (c *Client) VehicleGlossary(ctx context.Context, realm, vehicleID, lang str
 }
 
 func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
-	var response glossaryVehicleResponse
+	var response types.WgResponse[map[string]types.VehicleDetails]
 	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
 	if len(fields) > 0 {

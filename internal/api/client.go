@@ -117,10 +117,7 @@ func (c *Client) sendRequest(ctx context.Context, realm string, path endpoint, t
 	}
 
 	// Decode response
-	var responseDecoded struct {
-		types.WgResponse
-		Data interface{} `json:"data"`
-	}
+	var responseDecoded types.WgResponse[any]
 	err = json.Unmarshal(body, &responseDecoded)
 	if err != nil {
 		return common.ErrFailedToDecodeResponse

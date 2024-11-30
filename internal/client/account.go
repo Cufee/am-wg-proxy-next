@@ -11,13 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type searchResponse struct {
-	types.WgResponse
-	Data []types.Account `json:"data"`
-}
-
 func (c *Client) SearchAccounts(ctx context.Context, realm, search string, limit int, fields ...string) ([]types.Account, error) {
-	var response searchResponse
+	var response types.WgResponse[[]types.Account]
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -37,11 +32,6 @@ func (c *Client) SearchAccounts(ctx context.Context, realm, search string, limit
 	return response.Data, nil
 }
 
-type infoResponse struct {
-	types.WgResponse
-	Data map[string]types.ExtendedAccount `json:"data"`
-}
-
 func (c *Client) AccountByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedAccount, error) {
 	accountsMap, err := c.BatchAccountByID(ctx, realm, []string{id}, fields...)
 	if err != nil {
@@ -56,7 +46,7 @@ func (c *Client) AccountByID(ctx context.Context, realm string, id string, field
 }
 
 func (c *Client) BatchAccountByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
-	var response infoResponse
+	var response types.WgResponse[map[string]types.ExtendedAccount]
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -74,11 +64,6 @@ func (c *Client) BatchAccountByID(ctx context.Context, realm string, ids []strin
 	return response.Data, nil
 }
 
-type accountClanInfoResponse struct {
-	types.WgResponse
-	Data map[string]types.ClanMember `json:"data"`
-}
-
 func (c *Client) AccountClan(ctx context.Context, realm string, playerId string, fields ...string) (types.ClanMember, error) {
 	data, err := c.BatchAccountClan(ctx, realm, []string{playerId}, fields...)
 	if err != nil {
@@ -93,7 +78,7 @@ func (c *Client) AccountClan(ctx context.Context, realm string, playerId string,
 }
 
 func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
-	var response accountClanInfoResponse
+	var response types.WgResponse[map[string]types.ClanMember]
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -112,18 +97,8 @@ func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []strin
 	return response.Data, nil
 }
 
-type vehiclesResponse struct {
-	types.WgResponse
-	Data map[string][]types.VehicleStatsFrame `json:"data"`
-}
-
-// type vehicleAchievementsResponse struct {
-// 	types.WgResponse
-// 	Data map[string]types.AchievementsFrame `json:"data"`
-// }
-
 func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, vehicles []string, fields ...string) ([]types.VehicleStatsFrame, error) {
-	var response vehiclesResponse
+	var response types.WgResponse[map[string][]types.VehicleStatsFrame]
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -148,15 +123,7 @@ func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, v
 	return info, nil
 }
 
-type achievementsResponse struct {
-	types.WgResponse
-	Data map[string]struct {
-		Achievements types.AchievementsFrame `json:"achievements"`
-	} `json:"data"`
-}
-
 func (c *Client) AccountAchievements(ctx context.Context, realm string, id string, fields ...string) (types.AchievementsFrame, error) {
-
 	achievementsMap, err := c.BatchAccountAchievements(ctx, realm, []string{id}, fields...)
 	if err != nil {
 		return types.AchievementsFrame{}, errors.Wrap(err, "GetAccountAchievements > GetBulkAccountsAchievements")
@@ -169,17 +136,12 @@ func (c *Client) AccountAchievements(ctx context.Context, realm string, id strin
 	return info, nil
 }
 
-type vehicleAchievementsResponse struct {
-	types.WgResponse
-	Data map[string][]struct {
+func (c *Client) AccountVehicleAchievements(ctx context.Context, realm string, id string, fields ...string) (map[string]types.AchievementsFrame, error) {
+	var response types.WgResponse[map[string][]struct {
 		Achievements types.AchievementsFrame `json:"achievements"`
 		AccountID    int                     `json:"account_id"`
 		TankID       int                     `json:"tank_id"`
-	} `json:"data"`
-}
-
-func (c *Client) AccountVehicleAchievements(ctx context.Context, realm string, id string, fields ...string) (map[string]types.AchievementsFrame, error) {
-	var response vehicleAchievementsResponse
+	}]
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -207,7 +169,9 @@ func (c *Client) AccountVehicleAchievements(ctx context.Context, realm string, i
 }
 
 func (c *Client) BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
-	var response achievementsResponse
+	var response types.WgResponse[map[string]struct {
+		Achievements types.AchievementsFrame `json:"achievements"`
+	}]
 	query := url.Values{}
 	query.Set("fields", "achievements")
 	if len(fields) > 0 {

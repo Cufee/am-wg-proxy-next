@@ -10,13 +10,8 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-type clanSearchResponse struct {
-	types.WgResponse
-	Data []types.Clan `json:"data"`
-}
-
 func (c *Client) SearchClans(ctx context.Context, realm, search string, limit int, fields ...string) ([]types.Clan, error) {
-	var response clanSearchResponse
+	var response types.WgResponse[[]types.Clan]
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))
@@ -34,11 +29,6 @@ func (c *Client) SearchClans(ctx context.Context, realm, search string, limit in
 	return response.Data, nil
 }
 
-type clanInfoResponse struct {
-	types.WgResponse
-	Data map[string]types.ExtendedClan `json:"data"`
-}
-
 func (c *Client) ClanByID(ctx context.Context, realm string, clanId string, fields ...string) (types.ExtendedClan, error) {
 	data, err := c.BatchClanByID(ctx, realm, []string{clanId}, fields...)
 	if err != nil {
@@ -53,7 +43,7 @@ func (c *Client) ClanByID(ctx context.Context, realm string, clanId string, fiel
 }
 
 func (c *Client) BatchClanByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
-	var response clanInfoResponse
+	var response types.WgResponse[map[string]types.ExtendedClan]
 	query := url.Values{}
 	if len(fields) > 0 {
 		query.Set("fields", strings.Join(fields, ","))

@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"sync"
+	"sync/atomic"
 )
 
 func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (*proxyBucket, error) {
@@ -39,7 +39,8 @@ func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (
 		bucketSettings.rps = fallbackRps
 	}
 
-	bucketSettings.mu = sync.Mutex{}
+	var requestCounter atomic.Int32
+	bucketSettings.activeRequests = &requestCounter
 	bucketSettings.limiter = make(chan int, bucketSettings.rps)
 
 	bucketSettings.proxyUrl = buildProxyURL(bucketSettings.host, bucketSettings.port, bucketSettings.username, bucketSettings.password)

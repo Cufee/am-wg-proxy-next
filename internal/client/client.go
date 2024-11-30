@@ -2,7 +2,7 @@ package client
 
 import (
 	"errors"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -35,13 +35,15 @@ func NewClient(logger zerolog.Logger, wargamingAppID string, requestsPerSecond i
 		opts.Timeout = time.Second * 3
 	}
 
+	var active atomic.Int32
+	active.Store(int32(requestsPerSecond * 100)) // Make sure this bucket is never picked
+
 	client := Client{proxyBuckets: make(map[string][]*proxyBucket), options: opts}
 	client.addBucket(bucketKeyWildcard, &proxyBucket{
-		mu:             sync.Mutex{},
 		rps:            requestsPerSecond,
 		wgAppId:        wargamingAppID,
 		limiter:        make(chan int, requestsPerSecond),
-		activeRequests: requestsPerSecond * 100, // Make sure this bucket is never picked
+		activeRequests: &active,
 		proxyUrl:       nil,
 	})
 
@@ -74,7 +76,7 @@ func (c *Client) getBucket(key string) (*proxyBucket, error) {
 	// Pick the bucket with the lowest active requests
 	var lowestRpsBucketIndex int
 	for i := range buckets {
-		if buckets[i].activeRequests < buckets[lowestRpsBucketIndex].activeRequests {
+		if buckets[i].activeRequests.Load() < buckets[lowestRpsBucketIndex].activeRequests.Load() {
 			lowestRpsBucketIndex = i
 		}
 	}

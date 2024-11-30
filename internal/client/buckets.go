@@ -3,7 +3,7 @@ package client
 import (
 	"errors"
 	"net/url"
-	"sync"
+	"sync/atomic"
 
 	"github.com/rs/zerolog"
 
@@ -23,9 +23,8 @@ type proxyBucket struct {
 	realm   string
 	wgAppId string
 
-	mu             sync.Mutex
 	limiter        chan int
-	activeRequests int
+	activeRequests *atomic.Int32
 
 	proxyUrl   *url.URL
 	authHeader string
@@ -34,18 +33,13 @@ type proxyBucket struct {
 func (b *proxyBucket) waitForTick(logger zerolog.Logger) {
 	logger.Debug().Str("realm", b.realm).Msg("Waiting for tick")
 
-	b.mu.Lock()
-	b.activeRequests++
-	b.mu.Unlock()
+	b.activeRequests.Add(1)
 	b.limiter <- 1
 }
 
 func (b *proxyBucket) onComplete(logger zerolog.Logger) {
 	<-b.limiter
-
-	b.mu.Lock()
-	b.activeRequests--
-	b.mu.Unlock()
+	b.activeRequests.Add(-1)
 
 	logger.Debug().Str("realm", b.realm).Msg("Completed request")
 }

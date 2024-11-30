@@ -97,15 +97,14 @@ func (c *Client) httpRequest(ctx context.Context, url *url.URL, method string, p
 		Transport: transport,
 	}
 	defer client.CloseIdleConnections()
+
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
 		event.Err(errors.Wrap(err, "client#Do failed"))
 		return 0, err
 	}
-	if resp != nil {
-		event.Int("status code", resp.StatusCode)
-	}
 	defer resp.Body.Close()
+	event.Int("status code", resp.StatusCode)
 
 	if target != nil {
 		err := json.NewDecoder(resp.Body).Decode(target)
