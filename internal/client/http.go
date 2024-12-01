@@ -3,7 +3,8 @@ package client
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+
+	"github.com/cufee/am-wg-proxy-next/v2/internal/json"
 
 	"net/http"
 	"net/url"

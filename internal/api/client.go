@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,6 +12,7 @@ import (
 	"time"
 
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/json"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog"
