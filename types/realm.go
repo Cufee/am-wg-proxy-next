@@ -13,5 +13,5 @@ const (
 	RealmEurope       = Realm("EU")
 	RealmRussia       = Realm("RU")
 	RealmChina        = Realm("CH")
-	RealmAsia         = Realm("ASIA")
+	RealmAsia         = Realm("AS")
 )
