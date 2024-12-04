@@ -75,14 +75,14 @@ const (
 	bulkAccountAchievementsEndpoint endpoint = "/bulk/accounts/achievements"
 )
 
-func (c *Client) sendRequest(ctx context.Context, realm string, path endpoint, target interface{}, optsInput ...requestOptions) error {
+func (c *Client) sendRequest(ctx context.Context, realm types.Realm, path endpoint, target interface{}, optsInput ...requestOptions) error {
 	opts := newDefaultRequestOptions()
 	if len(optsInput) > 0 {
 		opts = optsInput[0]
 	}
 
 	// Build URL
-	urlData, err := url.Parse(fmt.Sprintf("%s/query/%s%s", c.host, strings.ToUpper(realm), path))
+	urlData, err := url.Parse(fmt.Sprintf("%s/query/%s%s", c.host, realm.String(), path))
 	if err != nil {
 		return errors.New("failed to parse URL")
 	}

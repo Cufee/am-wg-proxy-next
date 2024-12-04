@@ -11,5 +11,6 @@ var (
 
 	ErrNoStatsForVehicle = errors.New("vehicle has no stats")
 
-	ErrInvalidAccountID = errors.New("invalid account id")
+	ErrInvalidAccountID  = errors.New("invalid account id")
+	ErrRealmNotSupported = errors.New("realm not supported")
 )

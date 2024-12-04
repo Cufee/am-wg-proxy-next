@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 
+	"github.com/cufee/am-wg-proxy-next/v2/client/common"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/json"
+	"github.com/cufee/am-wg-proxy-next/v2/types"
 
 	"net/http"
 	"net/url"
@@ -16,19 +18,19 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func (c *Client) Request(ctx context.Context, realm, path, method string, payload []byte, target interface{}) (int, error) {
-	bkt, err := c.getBucket(realm)
+func (c *Client) Request(ctx context.Context, realm types.Realm, path, method string, payload []byte, target interface{}) (int, error) {
+	baseUri, err := baseUriFromRealm(realm)
+	if err != nil {
+		return 0, err
+	}
+
+	bkt, err := c.getBucket(realm.String())
 	if err != nil {
 		return 0, err
 	}
 
 	bkt.waitForTick(c.logger)
 	defer bkt.onComplete(c.logger)
-
-	baseUri, err := baseUriFromRealm(realm)
-	if err != nil {
-		return 0, err
-	}
 
 	endpoint, err := url.Parse(baseUri + path)
 	if err != nil {
@@ -39,7 +41,7 @@ func (c *Client) Request(ctx context.Context, realm, path, method string, payloa
 	query.Set("application_id", bkt.wgAppId)
 	endpoint.RawQuery = query.Encode()
 
-	c.logger.Debug().Str("realm", realm).Str("endpoint", endpoint.String()).Msg("Sending request")
+	c.logger.Debug().Str("realm", realm.String()).Str("endpoint", endpoint.String()).Msg("Sending request")
 
 	headers := make(map[string]string)
 	if bkt.proxyUrl != nil {
@@ -49,16 +51,17 @@ func (c *Client) Request(ctx context.Context, realm, path, method string, payloa
 	return c.httpRequest(ctx, endpoint, method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
 }
 
-func baseUriFromRealm(realm string) (string, error) {
-	switch strings.ToUpper(realm) {
-	case "EU":
-		return "https://api.wotblitz.eu/wotb/", nil
-	case "NA":
-		return "https://api.wotblitz.com/wotb/", nil
-	case "AS":
-		return "https://api.wotblitz.asia/wotb/", nil
+func baseUriFromRealm(realm types.Realm) (string, error) {
+	switch realm {
 	default:
-		return "", errors.New("unknown realm")
+		return "", common.ErrRealmNotSupported
+
+	case types.RealmEurope:
+		return "https://api.wotblitz.eu/wotb/", nil
+	case types.RealmNorthAmerica:
+		return "https://api.wotblitz.com/wotb/", nil
+	case types.RealmAsia:
+		return "https://api.wotblitz.asia/wotb/", nil
 	}
 }
 

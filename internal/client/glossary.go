@@ -10,7 +10,7 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) VehicleGlossary(ctx context.Context, realm, vehicleID, lang string, fields ...string) (types.VehicleDetails, error) {
+func (c *Client) VehicleGlossary(ctx context.Context, realm types.Realm, vehicleID, lang string, fields ...string) (types.VehicleDetails, error) {
 	var response types.WgResponse[map[string]types.VehicleDetails]
 	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
@@ -35,7 +35,7 @@ func (c *Client) VehicleGlossary(ctx context.Context, realm, vehicleID, lang str
 	return info, nil
 }
 
-func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
+func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm types.Realm, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
 	var response types.WgResponse[map[string]types.VehicleDetails]
 	query := url.Values{}
 	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")

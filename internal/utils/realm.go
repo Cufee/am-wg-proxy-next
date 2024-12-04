@@ -3,6 +3,7 @@ package utils
 import (
 	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
@@ -39,6 +40,15 @@ func RealmFromID(idStr string) *types.Realm {
 	}
 	for _, region := range regions {
 		if id >= region.min {
+			return &region.realm
+		}
+	}
+	return nil
+}
+
+func ParseRealm(realm string) *types.Realm {
+	for _, region := range regions {
+		if region.realm.String() == strings.ToUpper(realm) {
 			return &region.realm
 		}
 	}

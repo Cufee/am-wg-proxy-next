@@ -10,7 +10,7 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) SearchClans(ctx context.Context, realm, search string, limit int, fields ...string) ([]types.Clan, error) {
+func (c *Client) SearchClans(ctx context.Context, realm types.Realm, search string, limit int, fields ...string) ([]types.Clan, error) {
 	var response types.WgResponse[[]types.Clan]
 	query := url.Values{}
 	if len(fields) > 0 {
@@ -29,7 +29,7 @@ func (c *Client) SearchClans(ctx context.Context, realm, search string, limit in
 	return response.Data, nil
 }
 
-func (c *Client) ClanByID(ctx context.Context, realm string, clanId string, fields ...string) (types.ExtendedClan, error) {
+func (c *Client) ClanByID(ctx context.Context, realm types.Realm, clanId string, fields ...string) (types.ExtendedClan, error) {
 	data, err := c.BatchClanByID(ctx, realm, []string{clanId}, fields...)
 	if err != nil {
 		return types.ExtendedClan{}, err
@@ -42,7 +42,7 @@ func (c *Client) ClanByID(ctx context.Context, realm string, clanId string, fiel
 	return info, nil
 }
 
-func (c *Client) BatchClanByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
+func (c *Client) BatchClanByID(ctx context.Context, realm types.Realm, ids []string, fields ...string) (map[string]types.ExtendedClan, error) {
 	var response types.WgResponse[map[string]types.ExtendedClan]
 	query := url.Values{}
 	if len(fields) > 0 {

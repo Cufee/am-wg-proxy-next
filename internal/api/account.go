@@ -9,7 +9,7 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) SearchAccounts(ctx context.Context, realm, query string, limit int, fields ...string) ([]types.Account, error) {
+func (c *Client) SearchAccounts(ctx context.Context, realm types.Realm, query string, limit int, fields ...string) ([]types.Account, error) {
 	opts := newDefaultRequestOptions()
 	opts.Query.Add("query", query)
 	if len(fields) > 0 {
@@ -28,7 +28,7 @@ func (c *Client) SearchAccounts(ctx context.Context, realm, query string, limit 
 	return target, nil
 }
 
-func (c *Client) AccountByID(ctx context.Context, realm string, id string, fields ...string) (types.ExtendedAccount, error) {
+func (c *Client) AccountByID(ctx context.Context, realm types.Realm, id string, fields ...string) (types.ExtendedAccount, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
@@ -39,7 +39,7 @@ func (c *Client) AccountByID(ctx context.Context, realm string, id string, field
 }
 
 // bulk.Get("/accounts/info", query.BulkAccountsInfoHandler)
-func (c *Client) BatchAccountByID(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
+func (c *Client) BatchAccountByID(ctx context.Context, realm types.Realm, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
 	var target map[string]types.ExtendedAccount
 
 	opts := newDefaultRequestOptions()
@@ -51,7 +51,7 @@ func (c *Client) BatchAccountByID(ctx context.Context, realm string, ids []strin
 	return target, c.sendRequest(ctx, realm, bulkAccountInfoEndpoint, &target, opts)
 }
 
-func (c *Client) AccountClan(ctx context.Context, realm string, id string, fields ...string) (types.ClanMember, error) {
+func (c *Client) AccountClan(ctx context.Context, realm types.Realm, id string, fields ...string) (types.ClanMember, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
@@ -62,7 +62,7 @@ func (c *Client) AccountClan(ctx context.Context, realm string, id string, field
 }
 
 // bulk.Get("/accounts/clan", query.BulkAccountClanInfoHandler)
-func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.ClanMember, error) {
+func (c *Client) BatchAccountClan(ctx context.Context, realm types.Realm, ids []string, fields ...string) (map[string]types.ClanMember, error) {
 	var target map[string]types.ClanMember
 
 	opts := newDefaultRequestOptions()
@@ -74,7 +74,7 @@ func (c *Client) BatchAccountClan(ctx context.Context, realm string, ids []strin
 	return target, c.sendRequest(ctx, realm, bulkAccountClanInfoEndpoint, &target, opts)
 }
 
-func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, vehicles []string, fields ...string) ([]types.VehicleStatsFrame, error) {
+func (c *Client) AccountVehicles(ctx context.Context, realm types.Realm, id string, vehicles []string, fields ...string) ([]types.VehicleStatsFrame, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
@@ -87,7 +87,7 @@ func (c *Client) AccountVehicles(ctx context.Context, realm string, id string, v
 	return target, c.sendRequest(ctx, realm, accountGetVehiclesEndpointFMT.Fmt(id), &target, opts)
 }
 
-func (c *Client) AccountAchievements(ctx context.Context, realm string, id string, fields ...string) (types.AchievementsFrame, error) {
+func (c *Client) AccountAchievements(ctx context.Context, realm types.Realm, id string, fields ...string) (types.AchievementsFrame, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
@@ -97,7 +97,7 @@ func (c *Client) AccountAchievements(ctx context.Context, realm string, id strin
 	return target, c.sendRequest(ctx, realm, accountGetAchievementsEndpointFMT.Fmt(id), &target, opts)
 }
 
-func (c *Client) AccountVehicleAchievements(ctx context.Context, realm string, id string, fields ...string) (map[string]types.AchievementsFrame, error) {
+func (c *Client) AccountVehicleAchievements(ctx context.Context, realm types.Realm, id string, fields ...string) (map[string]types.AchievementsFrame, error) {
 	opts := newDefaultRequestOptions()
 	if len(fields) > 0 {
 		opts.Query.Add("fields", strings.Join(fields, ","))
@@ -108,7 +108,7 @@ func (c *Client) AccountVehicleAchievements(ctx context.Context, realm string, i
 }
 
 // bulk.Get("/accounts/achievements", query.BulkAccountsAchievementsHandler)
-func (c *Client) BatchAccountAchievements(ctx context.Context, realm string, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
+func (c *Client) BatchAccountAchievements(ctx context.Context, realm types.Realm, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
 	var target map[string]types.AchievementsFrame
 
 	opts := newDefaultRequestOptions()
