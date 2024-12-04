@@ -10,6 +10,7 @@ require (
 require (
 	github.com/gofiber/contrib/fiberzerolog v0.2.3
 	github.com/json-iterator/go v1.1.12
+	github.com/matryer/is v1.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.31.0
 )

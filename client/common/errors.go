@@ -10,4 +10,6 @@ var (
 	ErrRequestTimeOut         = errors.New("request timed out")
 
 	ErrNoStatsForVehicle = errors.New("vehicle has no stats")
+
+	ErrInvalidAccountID = errors.New("invalid account id")
 )

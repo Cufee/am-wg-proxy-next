@@ -29,6 +29,8 @@ type baseClient interface {
 
 	VehicleGlossary(ctx context.Context, realm string, vehicleId string, lang string, fields ...string) (types.VehicleDetails, error)
 	CompleteVehicleGlossary(ctx context.Context, realm string, lang string, fields ...string) (map[string]types.VehicleDetails, error)
+
+	RealmFromID(id string) (*types.Realm, error)
 }
 
 type Client interface {
