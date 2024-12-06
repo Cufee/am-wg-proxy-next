@@ -1,10 +1,9 @@
 package query
 
 import (
-	"strings"
-
 	"github.com/cufee/am-wg-proxy-next/v2/client"
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
+	internal "github.com/cufee/am-wg-proxy-next/v2/internal/client"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/utils"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/gofiber/fiber/v2"
@@ -20,13 +19,15 @@ func VehicleGlossaryHandler(wg client.Client) func(c *fiber.Ctx) error {
 			response.Error.Message = common.ErrRealmNotSupported.Error()
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
-		lang := c.Params("language", "en")
-		if vid == "" {
-			response.Error.Message = "vehicle id and realm are required"
+
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.VehicleGlossary(c.Context(), *realm, vid, lang, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.VehicleGlossary(c.Context(), *realm, vid, options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -46,9 +47,15 @@ func AllVehiclesGlossaryHandler(wg client.Client) func(c *fiber.Ctx) error {
 			response.Error.Message = common.ErrRealmNotSupported.Error()
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
-		lang := c.Params("language", "en")
 
-		result, err := wg.CompleteVehicleGlossary(c.Context(), *realm, lang, strings.Split(c.Query("fields", ""), ",")...)
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		result, err := wg.CompleteVehicleGlossary(c.Context(), *realm, options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

@@ -1,8 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"context"
-	"errors"
+
 	"fmt"
 	"io"
 	"net/http"
@@ -12,9 +13,11 @@ import (
 	"time"
 
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
+	"github.com/cufee/am-wg-proxy-next/v2/internal/client"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/json"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )
 
@@ -37,12 +40,14 @@ func (c *Client) Close() {
 }
 
 type requestOptions struct {
-	Query url.Values
+	Query   url.Values
+	Payload []client.Option
 }
 
-func newDefaultRequestOptions() requestOptions {
+func newDefaultRequestOptions(opts []client.Option) requestOptions {
 	defaultRequestOptions := requestOptions{
-		Query: url.Values{},
+		Query:   url.Values{},
+		Payload: opts,
 	}
 	return defaultRequestOptions
 }
@@ -75,12 +80,7 @@ const (
 	bulkAccountAchievementsEndpoint endpoint = "/bulk/accounts/achievements"
 )
 
-func (c *Client) sendRequest(ctx context.Context, realm types.Realm, path endpoint, target interface{}, optsInput ...requestOptions) error {
-	opts := newDefaultRequestOptions()
-	if len(optsInput) > 0 {
-		opts = optsInput[0]
-	}
-
+func (c *Client) sendRequest(ctx context.Context, realm types.Realm, path endpoint, target interface{}, opts requestOptions) error {
 	// Build URL
 	urlData, err := url.Parse(fmt.Sprintf("%s/query/%s%s", c.host, realm.String(), path))
 	if err != nil {
@@ -88,10 +88,16 @@ func (c *Client) sendRequest(ctx context.Context, realm types.Realm, path endpoi
 	}
 	urlData.RawQuery = opts.Query.Encode()
 
-	request, err := http.NewRequest("GET", urlData.String(), nil)
+	payload, err := json.Marshal(opts.Payload)
+	if err != nil {
+		return errors.Wrap(err, "failed to encode payload")
+	}
+
+	request, err := http.NewRequest("POST", urlData.String(), bytes.NewBuffer(payload))
 	if err != nil {
 		return err
 	}
+	request.Header.Set("content-type", "application/json")
 
 	// Send request
 	resp, err := c.httpClient.Do(request.WithContext(ctx))

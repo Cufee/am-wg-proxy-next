@@ -4,21 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
-	"strings"
 
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) VehicleGlossary(ctx context.Context, realm types.Realm, vehicleID, lang string, fields ...string) (types.VehicleDetails, error) {
+func (c *Client) VehicleGlossary(ctx context.Context, realm types.Realm, vehicleID string, opts ...Option) (types.VehicleDetails, error) {
 	var response types.WgResponse[map[string]types.VehicleDetails]
-	query := url.Values{}
-	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
+	options := GetOptions(opts...)
+	options.Fields = append(options.Fields, "tank_id", "name", "nation", "tier", "type", "is_premium")
+	query := options.Query()
 	query.Set("tank_id", vehicleID)
-	query.Set("language", lang)
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("encyclopedia/vehicles/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
@@ -35,14 +30,11 @@ func (c *Client) VehicleGlossary(ctx context.Context, realm types.Realm, vehicle
 	return info, nil
 }
 
-func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm types.Realm, lang string, fields ...string) (map[string]types.VehicleDetails, error) {
+func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm types.Realm, opts ...Option) (map[string]types.VehicleDetails, error) {
 	var response types.WgResponse[map[string]types.VehicleDetails]
-	query := url.Values{}
-	query.Set("fields", "tank_id,name,nation,tier,type,is_premium")
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
-	query.Set("language", lang)
+	options := GetOptions(opts...)
+	options.Fields = append(options.Fields, "tank_id", "name", "nation", "tier", "type", "is_premium")
+	query := options.Query()
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("encyclopedia/vehicles/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {

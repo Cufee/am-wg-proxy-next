@@ -5,6 +5,7 @@ import (
 
 	"github.com/cufee/am-wg-proxy-next/v2/client"
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
+	internal "github.com/cufee/am-wg-proxy-next/v2/internal/client"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/utils"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/gofiber/fiber/v2"
@@ -25,7 +26,14 @@ func BulkAccountsInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.BatchAccountByID(c.Context(), *realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		result, err := wg.BatchAccountByID(c.Context(), *realm, strings.Split(pids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -51,7 +59,14 @@ func BulkAccountsAchievementsHandler(wg client.Client) func(c *fiber.Ctx) error 
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.BatchAccountAchievements(c.Context(), *realm, strings.Split(pids, ","), strings.Split(c.Query("fields", ""), ",")...)
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		result, err := wg.BatchAccountAchievements(c.Context(), *realm, strings.Split(pids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -77,7 +92,14 @@ func BulkAccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.BatchAccountClan(c.Context(), *realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		result, err := wg.BatchAccountClan(c.Context(), *realm, strings.Split(cids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusNotFound).JSON(response)
@@ -102,7 +124,15 @@ func BulkClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			response.Error.Message = "clan id and realm are required"
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
-		result, err := wg.BatchClanByID(c.Context(), *realm, strings.Split(cids, ","), strings.Split(c.Query("fields", ""), ",")...)
+
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		result, err := wg.BatchClanByID(c.Context(), *realm, strings.Split(cids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

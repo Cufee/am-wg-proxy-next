@@ -1,11 +1,9 @@
 package query
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/cufee/am-wg-proxy-next/v2/client"
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
+	internal "github.com/cufee/am-wg-proxy-next/v2/internal/client"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/utils"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +24,14 @@ func AccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.AccountClan(c.Context(), *realm, pid, strings.Split(c.Query("fields", ""), ",")...)
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		result, err := wg.AccountClan(c.Context(), *realm, pid, options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -51,12 +56,15 @@ func SearchClansHandler(wg client.Client) func(c *fiber.Ctx) error {
 			response.Error.Message = "query and realm are required"
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
-		var limit = 3
-		if l, err := strconv.Atoi(c.Query("limit", "3")); err == nil && l > 1 {
-			limit = l
+
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.SearchClans(c.Context(), *realm, query, limit, strings.Split(c.Query("fields", ""), ",")...)
+		result, err := wg.SearchClans(c.Context(), *realm, query, options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -82,7 +90,14 @@ func ClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.ClanByID(c.Context(), *realm, cid, strings.Split(c.Query("fields", ""), ",")...)
+		var options []internal.Option
+		err := c.BodyParser(&options)
+		if err != nil {
+			response.Error.Message = "Invalid body"
+			return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		result, err := wg.ClanByID(c.Context(), *realm, cid, options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

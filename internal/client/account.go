@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"strconv"
 	"strings"
 
@@ -11,14 +10,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) SearchAccounts(ctx context.Context, realm types.Realm, search string, limit int, fields ...string) ([]types.Account, error) {
+func (c *Client) SearchAccounts(ctx context.Context, realm types.Realm, search string, opts ...Option) ([]types.Account, error) {
 	var response types.WgResponse[[]types.Account]
-	query := url.Values{}
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
+	options := GetOptions(opts...)
+	query := options.Query()
 	query.Set("search", search)
-	query.Set("limit", fmt.Sprint(limit))
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("account/list/?%s", query.Encode()), "GET", nil, &response)
 	if err != nil {
@@ -32,8 +28,8 @@ func (c *Client) SearchAccounts(ctx context.Context, realm types.Realm, search s
 	return response.Data, nil
 }
 
-func (c *Client) AccountByID(ctx context.Context, realm types.Realm, id string, fields ...string) (types.ExtendedAccount, error) {
-	accountsMap, err := c.BatchAccountByID(ctx, realm, []string{id}, fields...)
+func (c *Client) AccountByID(ctx context.Context, realm types.Realm, id string, opts ...Option) (types.ExtendedAccount, error) {
+	accountsMap, err := c.BatchAccountByID(ctx, realm, []string{id}, opts...)
 	if err != nil {
 		return types.ExtendedAccount{}, err
 	}
@@ -45,13 +41,11 @@ func (c *Client) AccountByID(ctx context.Context, realm types.Realm, id string, 
 	return info, nil
 }
 
-func (c *Client) BatchAccountByID(ctx context.Context, realm types.Realm, ids []string, fields ...string) (map[string]types.ExtendedAccount, error) {
+func (c *Client) BatchAccountByID(ctx context.Context, realm types.Realm, ids []string, opts ...Option) (map[string]types.ExtendedAccount, error) {
 	var response types.WgResponse[map[string]types.ExtendedAccount]
-	query := url.Values{}
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
-	query.Set("extra", "statistics.rating")
+	options := GetOptions(opts...)
+	options.Extra = append(options.Extra, "statistics.rating")
+	query := options.Query()
 	query.Set("account_id", strings.Join(ids, ","))
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("account/info/?%s", query.Encode()), "GET", nil, &response)
@@ -64,8 +58,8 @@ func (c *Client) BatchAccountByID(ctx context.Context, realm types.Realm, ids []
 	return response.Data, nil
 }
 
-func (c *Client) AccountClan(ctx context.Context, realm types.Realm, playerId string, fields ...string) (types.ClanMember, error) {
-	data, err := c.BatchAccountClan(ctx, realm, []string{playerId}, fields...)
+func (c *Client) AccountClan(ctx context.Context, realm types.Realm, playerId string, opts ...Option) (types.ClanMember, error) {
+	data, err := c.BatchAccountClan(ctx, realm, []string{playerId}, opts...)
 	if err != nil {
 		return types.ClanMember{}, err
 	}
@@ -77,13 +71,11 @@ func (c *Client) AccountClan(ctx context.Context, realm types.Realm, playerId st
 	return info, nil
 }
 
-func (c *Client) BatchAccountClan(ctx context.Context, realm types.Realm, ids []string, fields ...string) (map[string]types.ClanMember, error) {
+func (c *Client) BatchAccountClan(ctx context.Context, realm types.Realm, ids []string, opts ...Option) (map[string]types.ClanMember, error) {
 	var response types.WgResponse[map[string]types.ClanMember]
-	query := url.Values{}
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
-	query.Set("extra", "clan")
+	options := GetOptions(opts...)
+	options.Extra = append(options.Extra, "clan")
+	query := options.Query()
 	query.Set("account_id", strings.Join(ids, ","))
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("clans/accountinfo/?%s", query.Encode()), "GET", nil, &response)
@@ -97,12 +89,10 @@ func (c *Client) BatchAccountClan(ctx context.Context, realm types.Realm, ids []
 	return response.Data, nil
 }
 
-func (c *Client) AccountVehicles(ctx context.Context, realm types.Realm, id string, vehicles []string, fields ...string) ([]types.VehicleStatsFrame, error) {
+func (c *Client) AccountVehicles(ctx context.Context, realm types.Realm, id string, vehicles []string, opts ...Option) ([]types.VehicleStatsFrame, error) {
 	var response types.WgResponse[map[string][]types.VehicleStatsFrame]
-	query := url.Values{}
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
+	options := GetOptions(opts...)
+	query := options.Query()
 	query.Set("account_id", id)
 	if len(vehicles) > 0 {
 		query.Set("tank_id", strings.Join(vehicles, ","))
@@ -123,8 +113,8 @@ func (c *Client) AccountVehicles(ctx context.Context, realm types.Realm, id stri
 	return info, nil
 }
 
-func (c *Client) AccountAchievements(ctx context.Context, realm types.Realm, id string, fields ...string) (types.AchievementsFrame, error) {
-	achievementsMap, err := c.BatchAccountAchievements(ctx, realm, []string{id}, fields...)
+func (c *Client) AccountAchievements(ctx context.Context, realm types.Realm, id string, opts ...Option) (types.AchievementsFrame, error) {
+	achievementsMap, err := c.BatchAccountAchievements(ctx, realm, []string{id}, opts...)
 	if err != nil {
 		return types.AchievementsFrame{}, errors.Wrap(err, "GetAccountAchievements > GetBulkAccountsAchievements")
 	}
@@ -136,16 +126,14 @@ func (c *Client) AccountAchievements(ctx context.Context, realm types.Realm, id 
 	return info, nil
 }
 
-func (c *Client) AccountVehicleAchievements(ctx context.Context, realm types.Realm, id string, fields ...string) (map[string]types.AchievementsFrame, error) {
+func (c *Client) AccountVehicleAchievements(ctx context.Context, realm types.Realm, id string, opts ...Option) (map[string]types.AchievementsFrame, error) {
 	var response types.WgResponse[map[string][]struct {
 		Achievements types.AchievementsFrame `json:"achievements"`
 		AccountID    int                     `json:"account_id"`
 		TankID       int                     `json:"tank_id"`
 	}]
-	query := url.Values{}
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
+	options := GetOptions(opts...)
+	query := options.Query()
 	query.Set("account_id", id)
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("tanks/achievements/?%s", query.Encode()), "GET", nil, &response)
@@ -168,15 +156,13 @@ func (c *Client) AccountVehicleAchievements(ctx context.Context, realm types.Rea
 	return achievements, nil
 }
 
-func (c *Client) BatchAccountAchievements(ctx context.Context, realm types.Realm, ids []string, fields ...string) (map[string]types.AchievementsFrame, error) {
+func (c *Client) BatchAccountAchievements(ctx context.Context, realm types.Realm, ids []string, opts ...Option) (map[string]types.AchievementsFrame, error) {
 	var response types.WgResponse[map[string]struct {
 		Achievements types.AchievementsFrame `json:"achievements"`
 	}]
-	query := url.Values{}
-	query.Set("fields", "achievements")
-	if len(fields) > 0 {
-		query.Set("fields", strings.Join(fields, ","))
-	}
+	options := GetOptions(opts...)
+	options.Fields = append(options.Fields, "achievements")
+	query := options.Query()
 	query.Set("account_id", strings.Join(ids, ","))
 
 	_, err := c.Request(ctx, realm, fmt.Sprintf("account/achievements/?%s", query.Encode()), "GET", nil, &response)
