@@ -8,9 +8,9 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) VehicleGlossary(ctx context.Context, realm types.Realm, vehicleID string, opts ...Option) (types.VehicleDetails, error) {
+func (c *Client) VehicleGlossary(ctx context.Context, realm types.Realm, vehicleID string, opts ...types.Option) (types.VehicleDetails, error) {
 	var response types.WgResponse[map[string]types.VehicleDetails]
-	options := GetOptions(opts...)
+	options := types.GetOptions(opts...)
 	options.Fields = append(options.Fields, "tank_id", "name", "nation", "tier", "type", "is_premium")
 	query := options.Query()
 	query.Set("tank_id", vehicleID)
@@ -30,9 +30,9 @@ func (c *Client) VehicleGlossary(ctx context.Context, realm types.Realm, vehicle
 	return info, nil
 }
 
-func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm types.Realm, opts ...Option) (map[string]types.VehicleDetails, error) {
+func (c *Client) CompleteVehicleGlossary(ctx context.Context, realm types.Realm, opts ...types.Option) (map[string]types.VehicleDetails, error) {
 	var response types.WgResponse[map[string]types.VehicleDetails]
-	options := GetOptions(opts...)
+	options := types.GetOptions(opts...)
 	options.Fields = append(options.Fields, "tank_id", "name", "nation", "tier", "type", "is_premium")
 	query := options.Query()
 

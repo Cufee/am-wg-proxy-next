@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
-	"github.com/cufee/am-wg-proxy-next/v2/internal/client"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/json"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	_ "github.com/joho/godotenv/autoload"
@@ -41,10 +40,10 @@ func (c *Client) Close() {
 
 type requestOptions struct {
 	Query   url.Values
-	Payload []client.Option
+	Payload []types.Option
 }
 
-func newDefaultRequestOptions(opts []client.Option) requestOptions {
+func newDefaultRequestOptions(opts []types.Option) requestOptions {
 	defaultRequestOptions := requestOptions{
 		Query:   url.Values{},
 		Payload: opts,

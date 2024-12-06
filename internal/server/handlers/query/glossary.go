@@ -3,7 +3,6 @@ package query
 import (
 	"github.com/cufee/am-wg-proxy-next/v2/client"
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
-	internal "github.com/cufee/am-wg-proxy-next/v2/internal/client"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/utils"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/gofiber/fiber/v2"
@@ -20,7 +19,7 @@ func VehicleGlossaryHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		var options []internal.Option
+		var options []types.Option
 		err := c.BodyParser(&options)
 		if err != nil {
 			response.Error.Message = "Invalid body"
@@ -48,7 +47,7 @@ func AllVehiclesGlossaryHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		var options []internal.Option
+		var options []types.Option
 		err := c.BodyParser(&options)
 		if err != nil {
 			response.Error.Message = "Invalid body"

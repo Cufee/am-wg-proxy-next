@@ -13,22 +13,22 @@ import (
 )
 
 type baseClient interface {
-	SearchAccounts(ctx context.Context, realm types.Realm, query string, opts ...client.Option) ([]types.Account, error)
-	AccountByID(ctx context.Context, realm types.Realm, id string, opts ...client.Option) (types.ExtendedAccount, error)
-	BatchAccountByID(ctx context.Context, realm types.Realm, ids []string, opts ...client.Option) (map[string]types.ExtendedAccount, error)
-	AccountClan(ctx context.Context, realm types.Realm, id string, opts ...client.Option) (types.ClanMember, error)
-	BatchAccountClan(ctx context.Context, realm types.Realm, ids []string, opts ...client.Option) (map[string]types.ClanMember, error)
-	AccountVehicles(ctx context.Context, realm types.Realm, id string, vehicles []string, opts ...client.Option) ([]types.VehicleStatsFrame, error)
-	AccountAchievements(ctx context.Context, realm types.Realm, id string, opts ...client.Option) (types.AchievementsFrame, error)
-	AccountVehicleAchievements(ctx context.Context, realm types.Realm, id string, opts ...client.Option) (map[string]types.AchievementsFrame, error)
-	BatchAccountAchievements(ctx context.Context, realm types.Realm, ids []string, opts ...client.Option) (map[string]types.AchievementsFrame, error)
+	SearchAccounts(ctx context.Context, realm types.Realm, query string, opts ...types.Option) ([]types.Account, error)
+	AccountByID(ctx context.Context, realm types.Realm, id string, opts ...types.Option) (types.ExtendedAccount, error)
+	BatchAccountByID(ctx context.Context, realm types.Realm, ids []string, opts ...types.Option) (map[string]types.ExtendedAccount, error)
+	AccountClan(ctx context.Context, realm types.Realm, id string, opts ...types.Option) (types.ClanMember, error)
+	BatchAccountClan(ctx context.Context, realm types.Realm, ids []string, opts ...types.Option) (map[string]types.ClanMember, error)
+	AccountVehicles(ctx context.Context, realm types.Realm, id string, vehicles []string, opts ...types.Option) ([]types.VehicleStatsFrame, error)
+	AccountAchievements(ctx context.Context, realm types.Realm, id string, opts ...types.Option) (types.AchievementsFrame, error)
+	AccountVehicleAchievements(ctx context.Context, realm types.Realm, id string, opts ...types.Option) (map[string]types.AchievementsFrame, error)
+	BatchAccountAchievements(ctx context.Context, realm types.Realm, ids []string, opts ...types.Option) (map[string]types.AchievementsFrame, error)
 
-	SearchClans(ctx context.Context, realm types.Realm, query string, opts ...client.Option) ([]types.Clan, error)
-	ClanByID(ctx context.Context, realm types.Realm, id string, opts ...client.Option) (types.ExtendedClan, error)
-	BatchClanByID(ctx context.Context, realm types.Realm, ids []string, opts ...client.Option) (map[string]types.ExtendedClan, error)
+	SearchClans(ctx context.Context, realm types.Realm, query string, opts ...types.Option) ([]types.Clan, error)
+	ClanByID(ctx context.Context, realm types.Realm, id string, opts ...types.Option) (types.ExtendedClan, error)
+	BatchClanByID(ctx context.Context, realm types.Realm, ids []string, opts ...types.Option) (map[string]types.ExtendedClan, error)
 
-	VehicleGlossary(ctx context.Context, realm types.Realm, vehicleId string, opts ...client.Option) (types.VehicleDetails, error)
-	CompleteVehicleGlossary(ctx context.Context, realm types.Realm, opts ...client.Option) (map[string]types.VehicleDetails, error)
+	VehicleGlossary(ctx context.Context, realm types.Realm, vehicleId string, opts ...types.Option) (types.VehicleDetails, error)
+	CompleteVehicleGlossary(ctx context.Context, realm types.Realm, opts ...types.Option) (map[string]types.VehicleDetails, error)
 
 	RealmFromID(id string) (*types.Realm, error)
 }

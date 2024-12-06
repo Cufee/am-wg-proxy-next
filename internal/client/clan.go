@@ -9,9 +9,9 @@ import (
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 )
 
-func (c *Client) SearchClans(ctx context.Context, realm types.Realm, search string, opts ...Option) ([]types.Clan, error) {
+func (c *Client) SearchClans(ctx context.Context, realm types.Realm, search string, opts ...types.Option) ([]types.Clan, error) {
 	var response types.WgResponse[[]types.Clan]
-	options := GetOptions(opts...)
+	options := types.GetOptions(opts...)
 	query := options.Query()
 	query.Set("search", search)
 
@@ -25,7 +25,7 @@ func (c *Client) SearchClans(ctx context.Context, realm types.Realm, search stri
 	return response.Data, nil
 }
 
-func (c *Client) ClanByID(ctx context.Context, realm types.Realm, clanId string, opts ...Option) (types.ExtendedClan, error) {
+func (c *Client) ClanByID(ctx context.Context, realm types.Realm, clanId string, opts ...types.Option) (types.ExtendedClan, error) {
 	data, err := c.BatchClanByID(ctx, realm, []string{clanId}, opts...)
 	if err != nil {
 		return types.ExtendedClan{}, err
@@ -38,9 +38,9 @@ func (c *Client) ClanByID(ctx context.Context, realm types.Realm, clanId string,
 	return info, nil
 }
 
-func (c *Client) BatchClanByID(ctx context.Context, realm types.Realm, ids []string, opts ...Option) (map[string]types.ExtendedClan, error) {
+func (c *Client) BatchClanByID(ctx context.Context, realm types.Realm, ids []string, opts ...types.Option) (map[string]types.ExtendedClan, error) {
 	var response types.WgResponse[map[string]types.ExtendedClan]
-	options := GetOptions(opts...)
+	options := types.GetOptions(opts...)
 	query := options.Query()
 	query.Set("clan_id", strings.Join(ids, ","))
 
