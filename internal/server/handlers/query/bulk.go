@@ -5,7 +5,6 @@ import (
 
 	"github.com/cufee/am-wg-proxy-next/v2/client"
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
-	"github.com/cufee/am-wg-proxy-next/v2/internal/utils"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,8 +14,8 @@ func BulkAccountsInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 		var response types.ResponseWithError[map[string]types.ExtendedAccount]
 
 		pids := c.Query("ids")
-		realm := utils.ParseRealm(c.Params("realm"))
-		if realm == nil {
+		realm, ok := common.ParseRealm(c.Params("realm"))
+		if !ok {
 			response.Error.Message = common.ErrRealmNotSupported.Error()
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
@@ -32,7 +31,7 @@ func BulkAccountsInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.BatchAccountByID(c.Context(), *realm, strings.Split(pids, ","), options...)
+		result, err := wg.BatchAccountByID(c.Context(), realm, strings.Split(pids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -48,8 +47,8 @@ func BulkAccountsAchievementsHandler(wg client.Client) func(c *fiber.Ctx) error 
 		var response types.ResponseWithError[map[string]types.AchievementsFrame]
 
 		pids := c.Query("ids")
-		realm := utils.ParseRealm(c.Params("realm"))
-		if realm == nil {
+		realm, ok := common.ParseRealm(c.Params("realm"))
+		if !ok {
 			response.Error.Message = common.ErrRealmNotSupported.Error()
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
@@ -65,7 +64,7 @@ func BulkAccountsAchievementsHandler(wg client.Client) func(c *fiber.Ctx) error 
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.BatchAccountAchievements(c.Context(), *realm, strings.Split(pids, ","), options...)
+		result, err := wg.BatchAccountAchievements(c.Context(), realm, strings.Split(pids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)
@@ -81,8 +80,8 @@ func BulkAccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 		var response types.ResponseWithError[map[string]types.ClanMember]
 
 		cids := c.Query("ids")
-		realm := utils.ParseRealm(c.Params("realm"))
-		if realm == nil {
+		realm, ok := common.ParseRealm(c.Params("realm"))
+		if !ok {
 			response.Error.Message = common.ErrRealmNotSupported.Error()
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
@@ -98,7 +97,7 @@ func BulkAccountClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.BatchAccountClan(c.Context(), *realm, strings.Split(cids, ","), options...)
+		result, err := wg.BatchAccountClan(c.Context(), realm, strings.Split(cids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusNotFound).JSON(response)
@@ -114,8 +113,8 @@ func BulkClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 		var response types.ResponseWithError[map[string]types.ExtendedClan]
 
 		cids := c.Query("ids")
-		realm := utils.ParseRealm(c.Params("realm"))
-		if realm == nil {
+		realm, ok := common.ParseRealm(c.Params("realm"))
+		if !ok {
 			response.Error.Message = common.ErrRealmNotSupported.Error()
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
@@ -131,7 +130,7 @@ func BulkClanInfoHandler(wg client.Client) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(response)
 		}
 
-		result, err := wg.BatchClanByID(c.Context(), *realm, strings.Split(cids, ","), options...)
+		result, err := wg.BatchClanByID(c.Context(), realm, strings.Split(cids, ","), options...)
 		if err != nil {
 			response.Error.Message = err.Error()
 			return c.Status(fiber.StatusInternalServerError).JSON(response)

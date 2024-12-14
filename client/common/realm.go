@@ -1,4 +1,4 @@
-package utils
+package common
 
 import (
 	"strconv"
@@ -21,24 +21,24 @@ var regions = []realmParams{
 	{realm: types.RealmRussia, min: 0e8},
 }
 
-func RealmFromID(idStr string) *types.Realm {
+func RealmFromID(idStr string) (types.Realm, bool) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return nil
+		return types.Realm(""), false
 	}
 	for _, region := range regions {
 		if id >= region.min {
-			return &region.realm
+			return region.realm, true
 		}
 	}
-	return nil
+	return types.Realm(""), false
 }
 
-func ParseRealm(realm string) *types.Realm {
+func ParseRealm(realm string) (types.Realm, bool) {
 	for _, region := range regions {
 		if region.realm.String() == strings.ToUpper(realm) {
-			return &region.realm
+			return region.realm, true
 		}
 	}
-	return nil
+	return types.Realm(""), false
 }

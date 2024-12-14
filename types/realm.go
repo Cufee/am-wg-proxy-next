@@ -1,35 +1,5 @@
 package types
 
-import (
-	"strings"
-)
-
-func ParseRealm(value string) (Realm, bool) {
-	value = strings.ToUpper(value)
-	switch value {
-	default:
-		return Realm(""), false
-
-	case RealmBotAccounts.String():
-		return RealmBotAccounts, true
-
-	case RealmNorthAmerica.String():
-		return RealmNorthAmerica, true
-
-	case RealmEurope.String():
-		return RealmEurope, true
-
-	case RealmRussia.String():
-		return RealmRussia, true
-
-	case RealmChina.String():
-		return RealmChina, true
-
-	case RealmAsia.String():
-		return RealmAsia, true
-	}
-}
-
 type Realm string
 
 func (r Realm) String() string {

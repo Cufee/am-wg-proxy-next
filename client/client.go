@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/cufee/am-wg-proxy-next/v2/internal/api"
@@ -30,32 +29,12 @@ type baseClient interface {
 	VehicleGlossary(ctx context.Context, realm types.Realm, vehicleId string, opts ...types.Option) (types.VehicleDetails, error)
 	CompleteVehicleGlossary(ctx context.Context, realm types.Realm, opts ...types.Option) (map[string]types.VehicleDetails, error)
 
-	RealmFromID(id string) (*types.Realm, error)
+	ParseRealm(value string) (types.Realm, bool)
+	RealmFromID(id string) (types.Realm, bool)
 }
 
 type Client interface {
 	baseClient
-	RealmFromAccountID(id string) string
-}
-
-type clientWithCommon struct {
-	baseClient
-}
-
-func (c clientWithCommon) RealmFromAccountID(id string) string {
-	intID, _ := strconv.Atoi(id)
-	switch {
-	case intID == 0:
-		return ""
-	case intID < 500000000:
-		return "RU"
-	case intID < 1000000000:
-		return "EU"
-	case intID < 2000000000:
-		return "NA"
-	default:
-		return "AS"
-	}
 }
 
 type clientOptions struct {
@@ -81,7 +60,7 @@ func NewEmbeddedClient(primaryWgAppID string, primaryWgAppRPS int, proxyHostList
 	if err != nil {
 		return nil, err
 	}
-	return clientWithCommon{c}, nil
+	return c, nil
 }
 
 func NewRemoteClient(apiHost string, requestTimeout time.Duration, opts ...ClientOption) (Client, error) {
@@ -91,5 +70,5 @@ func NewRemoteClient(apiHost string, requestTimeout time.Duration, opts ...Clien
 	}
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger().Level(options.logLevel)
 
-	return clientWithCommon{api.NewClient(logger, apiHost, requestTimeout)}, nil
+	return api.NewClient(logger, apiHost, requestTimeout), nil
 }
