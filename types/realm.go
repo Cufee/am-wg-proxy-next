@@ -6,6 +6,32 @@ func (r Realm) String() string {
 	return string(r)
 }
 
+func (r Realm) DomainBlitz() (string, bool) {
+	switch r {
+	default:
+		return "", false
+	case RealmNorthAmerica:
+		return "na.wotblitz.com", true
+	case RealmEurope:
+		return "eu.wotblitz.com", true
+	case RealmAsia:
+		return "asia.wotblitz.com", true
+	}
+}
+
+func (r Realm) DomainWorldOfTanks() (string, bool) {
+	switch r {
+	default:
+		return "", false
+	case RealmNorthAmerica:
+		return "api.worldoftanks.com", true
+	case RealmEurope:
+		return "api.worldoftanks.eu", true
+	case RealmAsia:
+		return "api.worldoftanks.asia", true
+	}
+}
+
 const (
 	RealmBotAccounts = Realm("BOT")
 

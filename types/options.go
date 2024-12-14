@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type options struct {
+type Options struct {
 	AccessToken string   `json:"access_token"`
 	Fields      []string `json:"fields"`
 	Extra       []string `json:"extra"`
@@ -14,62 +14,63 @@ type options struct {
 	SearchType  string   `json:"type"`
 	Limit       int      `json:"limit"`
 
-	custom url.Values `json:"-"`
+	OverwriteApplicationID int        `json:"-"`
+	custom                 url.Values `json:"-"`
 }
 
-type Option func(*options)
+type Option func(*Options)
 
 func WithCustom(key string, value string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.custom.Set(key, value)
 	}
 }
 
 func WithFields(fields ...string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.Fields = fields
 	}
 }
 
 func WithExtraFields(fields ...string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.Extra = fields
 	}
 }
 
 func WithLanguage(language string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.Language = language
 	}
 }
 
 func WithType(searchType string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.SearchType = searchType
 	}
 }
 
 func WithToken(token string) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.AccessToken = token
 	}
 }
 
 func WithLimit(limit int) Option {
-	return func(o *options) {
+	return func(o *Options) {
 		o.Limit = limit
 	}
 }
 
-func GetOptions(opts ...Option) options {
-	options := options{Limit: 3, custom: make(url.Values)}
+func GetOptions(opts ...Option) Options {
+	options := Options{Limit: 3, custom: make(url.Values)}
 	for _, apply := range opts {
 		apply(&options)
 	}
 	return options
 }
 
-func (o options) Query() url.Values {
+func (o Options) Query() url.Values {
 	form := o.custom
 	if o.Fields != nil {
 		form.Set("fields", strings.Join(o.Fields, ","))
