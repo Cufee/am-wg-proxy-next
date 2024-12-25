@@ -19,7 +19,20 @@ func (r Realm) DomainBlitz() (string, bool) {
 	}
 }
 
-func (r Realm) DomainWorldOfTanks() (string, bool) {
+func (r Realm) DomainBlitzAPI() (string, bool) {
+	switch r {
+	default:
+		return "", false
+	case RealmNorthAmerica:
+		return "api.wotblitz.com", true
+	case RealmEurope:
+		return "api.wotblitz.eu", true
+	case RealmAsia:
+		return "api.wotblitz.asia", true
+	}
+}
+
+func (r Realm) DomainWorldOfTanksAPI() (string, bool) {
 	switch r {
 	default:
 		return "", false
