@@ -1,11 +1,15 @@
 package client
 
 import (
+	"context"
 	"errors"
+	"net/http"
 	"net/url"
 	"sync/atomic"
+	"time"
 
 	"github.com/rs/zerolog"
+	"golang.org/x/time/rate"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -23,22 +27,49 @@ type proxyBucket struct {
 	realm   string
 	wgAppId string
 
-	limiter        chan int
+	limiter        *rate.Limiter
 	activeRequests *atomic.Int32
 
 	proxyUrl   *url.URL
-	authHeader string
+	httpClient *http.Client
 }
 
-func (b *proxyBucket) waitForTick(logger zerolog.Logger) {
+func newProxyBucket(rps int) proxyBucket {
+	var activeRequests atomic.Int32
+
+	return proxyBucket{
+		rps:            rps,
+		limiter:        rate.NewLimiter(rate.Limit(rps), 1),
+		activeRequests: &activeRequests,
+	}
+}
+
+func (b *proxyBucket) configureHTTPClient(timeout time.Duration) {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.MaxConnsPerHost = b.rps
+	transport.MaxIdleConnsPerHost = b.rps
+	if b.proxyUrl != nil {
+		transport.Proxy = http.ProxyURL(b.proxyUrl)
+	} else {
+		// Preserve the old direct-request behavior when no proxy is configured.
+		transport.Proxy = nil
+	}
+
+	b.httpClient = &http.Client{Timeout: timeout, Transport: transport}
+}
+
+func (b *proxyBucket) waitForTick(ctx context.Context, logger zerolog.Logger) error {
 	logger.Debug().Str("realm", b.realm).Msg("Waiting for tick")
 
+	if err := b.limiter.Wait(ctx); err != nil {
+		return err
+	}
 	b.activeRequests.Add(1)
-	b.limiter <- 1
+
+	return nil
 }
 
 func (b *proxyBucket) onComplete(logger zerolog.Logger) {
-	<-b.limiter
 	b.activeRequests.Add(-1)
 
 	logger.Debug().Str("realm", b.realm).Msg("Completed request")

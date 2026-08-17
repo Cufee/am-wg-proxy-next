@@ -1,16 +1,16 @@
 package client
 
 import (
-	"encoding/base64"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
-	"sync/atomic"
+
+	"golang.org/x/time/rate"
 )
 
 func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (*proxyBucket, error) {
-	var bucketSettings proxyBucket
+	bucketSettings := newProxyBucket(fallbackRps)
 
 	// some kind of valid protocol is required for url.Parse
 	if !strings.Contains(input, "://") {
@@ -35,16 +35,12 @@ func parseProxySettings(input string, fallbackWgAppId string, fallbackRps int) (
 
 	if rps, err := strconv.Atoi(parsed.Query().Get("maxRps")); err == nil {
 		bucketSettings.rps = rps
+		bucketSettings.limiter = rate.NewLimiter(rate.Limit(rps), 1)
 	} else {
 		bucketSettings.rps = fallbackRps
 	}
 
-	var requestCounter atomic.Int32
-	bucketSettings.activeRequests = &requestCounter
-	bucketSettings.limiter = make(chan int, bucketSettings.rps)
-
 	bucketSettings.proxyUrl = buildProxyURL(bucketSettings.host, bucketSettings.port, bucketSettings.username, bucketSettings.password)
-	bucketSettings.authHeader = "Basic " + base64.StdEncoding.EncodeToString([]byte(bucketSettings.username+":"+bucketSettings.password))
 
 	return &bucketSettings, nil
 }

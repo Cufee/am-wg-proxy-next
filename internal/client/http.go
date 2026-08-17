@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 
@@ -29,7 +28,9 @@ func (c *Client) Request(ctx context.Context, realm types.Realm, path, method st
 		return 0, err
 	}
 
-	bkt.waitForTick(c.logger)
+	if err := bkt.waitForTick(ctx, c.logger); err != nil {
+		return 0, err
+	}
 	defer bkt.onComplete(c.logger)
 
 	endpoint, err := url.Parse(baseUri + path)
@@ -43,12 +44,7 @@ func (c *Client) Request(ctx context.Context, realm types.Realm, path, method st
 
 	c.logger.Debug().Str("realm", realm.String()).Str("endpoint", endpoint.String()).Msg("Sending request")
 
-	headers := make(map[string]string)
-	if bkt.proxyUrl != nil {
-		headers["Proxy-Authorization"] = bkt.authHeader
-	}
-
-	return c.httpRequest(ctx, endpoint, method, bkt.proxyUrl, nil, payload, target, c.options.Timeout)
+	return c.httpRequest(ctx, endpoint, method, bkt, payload, target)
 }
 
 func baseUriFromRealm(realm types.Realm) (string, error) {
@@ -65,24 +61,19 @@ func baseUriFromRealm(realm types.Realm) (string, error) {
 	}
 }
 
-func (c *Client) httpRequest(ctx context.Context, url *url.URL, method string, proxy *url.URL, headers map[string]string, payload []byte, target interface{}, timeout time.Duration) (int, error) {
+func (c *Client) httpRequest(ctx context.Context, url *url.URL, method string, bucket *proxyBucket, payload []byte, target interface{}) (int, error) {
 	event := c.logger.Debug().Str("path", url.Path).Str("method", method)
-	if proxy != nil {
-		event.Str("proxy", proxy.Host)
+	if bucket.proxyUrl != nil {
+		event.Str("proxy", bucket.proxyUrl.Host)
 	}
 	defer func() {
 		event.Msg("wg api request")
 	}()
 
 	// Prep request
-	req, err := http.NewRequest(strings.ToUpper(method), url.String(), bytes.NewBuffer(payload))
+	req, err := http.NewRequestWithContext(ctx, strings.ToUpper(method), url.String(), bytes.NewBuffer(payload))
 	if err != nil {
 		return 0, err
-	}
-
-	// Set headers
-	for k, v := range headers {
-		req.Header.Set(k, v)
 	}
 
 	// Set payload headers
@@ -90,19 +81,7 @@ func (c *Client) httpRequest(ctx context.Context, url *url.URL, method string, p
 		req.Header.Set("content-type", "application/json")
 	}
 
-	// Send request
-	transport := &http.Transport{}
-	if proxy != nil {
-		transport.Proxy = http.ProxyURL(proxy)
-	}
-
-	client := &http.Client{
-		Timeout:   timeout,
-		Transport: transport,
-	}
-	defer client.CloseIdleConnections()
-
-	resp, err := client.Do(req.WithContext(ctx))
+	resp, err := bucket.httpClient.Do(req)
 	if err != nil {
 		event.Err(errors.Wrap(err, "client#Do failed"))
 		return 0, err
