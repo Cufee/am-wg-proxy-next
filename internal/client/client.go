@@ -2,7 +2,6 @@ package client
 
 import (
 	"errors"
-	"sync/atomic"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -35,20 +34,17 @@ func NewClient(logger zerolog.Logger, wargamingAppID string, requestsPerSecond i
 		opts.Timeout = time.Second * 3
 	}
 
-	var active atomic.Int32
-	active.Store(int32(requestsPerSecond * 100)) // Make sure this bucket is never picked
+	fallbackBucket := newProxyBucket(requestsPerSecond)
+	fallbackBucket.activeRequests.Store(int32(requestsPerSecond * 100)) // Make sure this bucket is never picked
+	fallbackBucket.wgAppId = wargamingAppID
+	fallbackBucket.configureHTTPClient(opts.Timeout)
 
 	client := Client{proxyBuckets: make(map[string][]*proxyBucket), options: opts}
-	client.addBucket(bucketKeyWildcard, &proxyBucket{
-		rps:            requestsPerSecond,
-		wgAppId:        wargamingAppID,
-		limiter:        make(chan int, requestsPerSecond),
-		activeRequests: &active,
-		proxyUrl:       nil,
-	})
+	client.addBucket(bucketKeyWildcard, &fallbackBucket)
 
 	for key, bucketSlice := range ParseProxyString(opts.BucketsString, wargamingAppID, requestsPerSecond) {
 		for _, b := range bucketSlice {
+			b.configureHTTPClient(opts.Timeout)
 			client.addBucket(key, b)
 		}
 	}
