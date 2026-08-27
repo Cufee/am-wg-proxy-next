@@ -3,15 +3,18 @@ package client
 import (
 	"context"
 	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/cufee/am-wg-proxy-next/v2/client/common"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 	"github.com/rs/zerolog"
 )
@@ -136,6 +139,62 @@ func TestProxyBucketLimitsRequestsPerSecond(t *testing.T) {
 
 	if elapsed := time.Since(started); elapsed < 900*time.Millisecond {
 		t.Fatalf("11 requests completed in %s; expected a 10 RPS limit", elapsed)
+	}
+}
+
+func TestHTTPResponseIsClassifiedBeforeJSONDecode(t *testing.T) {
+	tests := []struct {
+		name        string
+		status      int
+		contentType string
+		body        string
+		expectedErr error
+	}{
+		{
+			name:        "service unavailable HTML",
+			status:      http.StatusServiceUnavailable,
+			contentType: "text/html",
+			body:        "<html><title>503 Service Temporarily Unavailable</title></html>",
+			expectedErr: common.ErrSourceNotAvailable,
+		},
+		{
+			name:        "successful non JSON response",
+			status:      http.StatusOK,
+			contentType: "text/html; charset=utf-8",
+			body:        "<html></html>",
+			expectedErr: common.ErrUnexpectedContentType,
+		},
+		{
+			name:        "client error response",
+			status:      http.StatusTooManyRequests,
+			contentType: "application/json",
+			body:        `{}`,
+			expectedErr: common.ErrBadResponseCode,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			bucket := newProxyBucket(1)
+			bucket.httpClient = &http.Client{Transport: roundTripperFunc(func(*http.Request) (*http.Response, error) {
+				return &http.Response{
+					StatusCode: test.status,
+					Header:     http.Header{"Content-Type": []string{test.contentType}},
+					Body:       io.NopCloser(strings.NewReader(test.body)),
+				}, nil
+			})}
+
+			client := Client{logger: zerolog.Nop()}
+			endpoint, err := url.Parse("https://api.wotblitz.example/wotb/account/info/")
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			_, err = client.httpRequest(context.Background(), endpoint, http.MethodGet, &bucket, nil, &types.WgResponse[any]{})
+			if !errors.Is(err, test.expectedErr) {
+				t.Fatalf("expected %v, got %v", test.expectedErr, err)
+			}
+		})
 	}
 }
 

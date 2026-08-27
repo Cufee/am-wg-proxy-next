@@ -3,11 +3,13 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 
 	"github.com/cufee/am-wg-proxy-next/v2/client/common"
 	"github.com/cufee/am-wg-proxy-next/v2/internal/json"
 	"github.com/cufee/am-wg-proxy-next/v2/types"
 
+	"mime"
 	"net/http"
 	"net/url"
 	"strings"
@@ -89,8 +91,20 @@ func (c *Client) httpRequest(ctx context.Context, url *url.URL, method string, b
 	defer resp.Body.Close()
 	event.Int("status code", resp.StatusCode)
 
+	if resp.StatusCode >= http.StatusInternalServerError {
+		return resp.StatusCode, fmt.Errorf("%w: received HTTP %d", common.ErrSourceNotAvailable, resp.StatusCode)
+	}
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return resp.StatusCode, fmt.Errorf("%w: received HTTP %d", common.ErrBadResponseCode, resp.StatusCode)
+	}
+
 	if target != nil {
-		err := json.NewDecoder(resp.Body).Decode(target)
+		contentType, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil || contentType != "application/json" {
+			return resp.StatusCode, fmt.Errorf("%w: received content type %q", common.ErrUnexpectedContentType, resp.Header.Get("Content-Type"))
+		}
+
+		err = json.NewDecoder(resp.Body).Decode(target)
 		if err != nil {
 			event.Err(errors.Wrap(err, "json#Decode failed"))
 			return resp.StatusCode, err
