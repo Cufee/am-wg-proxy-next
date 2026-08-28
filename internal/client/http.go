@@ -77,6 +77,9 @@ func (c *Client) httpRequest(ctx context.Context, url *url.URL, method string, b
 	if err != nil {
 		return 0, err
 	}
+	if c.options.UserAgent != "" {
+		req.Header.Set("User-Agent", c.options.UserAgent)
+	}
 
 	// Set payload headers
 	if payload != nil {

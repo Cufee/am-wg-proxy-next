@@ -38,10 +38,14 @@ type Client interface {
 }
 
 type clientOptions struct {
-	logLevel zerolog.Level
+	logLevel  zerolog.Level
+	userAgent string
 }
 
-var defaultOptions = clientOptions{logLevel: zerolog.InfoLevel}
+var defaultOptions = clientOptions{
+	logLevel:  zerolog.InfoLevel,
+	userAgent: "am-wg-proxy-next/2",
+}
 
 type ClientOption func(*clientOptions)
 
@@ -49,14 +53,18 @@ func WithLogLevel(level zerolog.Level) ClientOption {
 	return func(co *clientOptions) { co.logLevel = level }
 }
 
+func WithUserAgent(value string) ClientOption {
+	return func(co *clientOptions) { co.userAgent = value }
+}
+
 func NewEmbeddedClient(primaryWgAppID string, primaryWgAppRPS int, proxyHostList string, requestTimeout time.Duration, opts ...ClientOption) (Client, error) {
 	options := defaultOptions
 	for _, apply := range opts {
-		apply(&defaultOptions)
+		apply(&options)
 	}
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger().Level(options.logLevel)
 
-	c, err := client.NewClient(logger, primaryWgAppID, primaryWgAppRPS, client.Options{BucketsString: proxyHostList, Timeout: requestTimeout})
+	c, err := client.NewClient(logger, primaryWgAppID, primaryWgAppRPS, client.Options{BucketsString: proxyHostList, Timeout: requestTimeout, UserAgent: options.userAgent})
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +74,7 @@ func NewEmbeddedClient(primaryWgAppID string, primaryWgAppRPS int, proxyHostList
 func NewRemoteClient(apiHost string, requestTimeout time.Duration, opts ...ClientOption) (Client, error) {
 	options := defaultOptions
 	for _, apply := range opts {
-		apply(&defaultOptions)
+		apply(&options)
 	}
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger().Level(options.logLevel)
 

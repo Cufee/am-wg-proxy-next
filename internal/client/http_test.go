@@ -198,6 +198,31 @@ func TestHTTPResponseIsClassifiedBeforeJSONDecode(t *testing.T) {
 	}
 }
 
+func TestHTTPRequestsIncludeConfiguredUserAgent(t *testing.T) {
+	var userAgent string
+	bucket := newProxyBucket(1)
+	bucket.httpClient = &http.Client{Transport: roundTripperFunc(func(request *http.Request) (*http.Response, error) {
+		userAgent = request.UserAgent()
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Header:     http.Header{"Content-Type": []string{"application/json"}},
+			Body:       io.NopCloser(strings.NewReader(`{}`)),
+		}, nil
+	})}
+
+	client := Client{logger: zerolog.Nop(), options: Options{UserAgent: "Aftermath/1.0 (+https://amth.one)"}}
+	endpoint, err := url.Parse("https://api.wotblitz.example/wotb/account/info/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := client.httpRequest(context.Background(), endpoint, http.MethodGet, &bucket, nil, &types.WgResponse[any]{}); err != nil {
+		t.Fatal(err)
+	}
+	if userAgent != "Aftermath/1.0 (+https://amth.one)" {
+		t.Fatalf("unexpected user agent: %q", userAgent)
+	}
+}
+
 func TestRequestReturnsContextCancellationBeforeOutboundCall(t *testing.T) {
 	bucket := newProxyBucket(1)
 	bucket.wgAppId = "app-id"

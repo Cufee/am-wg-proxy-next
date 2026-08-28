@@ -11,6 +11,7 @@ import (
 type Options struct {
 	BucketsString string
 	Timeout       time.Duration
+	UserAgent     string
 }
 
 type Client struct {
